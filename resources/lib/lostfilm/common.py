@@ -26,6 +26,10 @@ def refresh_menu():
     return [(lang(40302), actions.refresh())]
 
 
+def go_to_series_menu(s):
+    return [(lang(40307), actions.update_view(series_url(s)))]
+
+
 def select_quality_menu(e):
     """
     :type e: Episode
@@ -93,7 +97,7 @@ def itemify_episode(e, s):
         'label': episode_label(e),
         'path': episode_url(e),
         'context_menu':
-            select_quality_menu(e) + refresh_menu() +
+            select_quality_menu(e) + go_to_series_menu(s) + refresh_menu() +
             info_menu(e) + toggle_watched_menu(),
         'is_playable': not e.is_complete_season,
     })
@@ -171,7 +175,7 @@ def itemify_series(s):
     item = itemify_common(s)
     item.update({
         'label': series_label(s),
-        'path': plugin.url_for('browse_series', series_id=s.id),
+        'path': series_url(s),
         'context_menu':
             info_menu(s),
         'is_playable': False,
@@ -182,6 +186,13 @@ def itemify_series(s):
         'original_title': s.original_title,
     })
     return item
+
+
+def series_url(s):
+    """
+    :type s: Series
+    """
+    return plugin.url_for('browse_series', series_id=s.id)
 
 
 def select_torrent_link(series, season, episode, force=False):

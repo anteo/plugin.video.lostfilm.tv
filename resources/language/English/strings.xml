@@ -3,9 +3,9 @@
     <!-- Plugin name -->
     <string id="30000">LostFilm.TV</string>
 
-    <string id="32000">Timeout while loading MediaPoisk.info pages</string>
+    <string id="32000">Timeout while loading LostFilm.TV pages</string>
     <string id="32001">Can't open MediaPoisk.info page</string>
-    <string id="32002">Malformed answer from MediaPoisk.info (see log)</string>
+    <string id="32002">Malformed answer from LostFilm.TV (see log)</string>
     <string id="32003">Authorization failed; check login and password</string>
 
     <string id="32004">Malformed answer from uTorrent</string>
@@ -132,6 +132,7 @@
     <string id="40303">Browse using quality...</string>
     <string id="40305">Toggle watched</string>
     <string id="40306">TV show information</string>
+    <string id="40307">Go to TV show</string>
 
     <string id="40400">Choose the quality</string>
     <string id="40401">&lt;&lt; All series &gt;&gt;</string>
