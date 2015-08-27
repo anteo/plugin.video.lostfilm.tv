@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <!-- Plugin name -->
+    <string id="30000">LostFilm.TV</string>
+
+    <string id="32000">Timeout while loading MediaPoisk.info pages</string>
+    <string id="32001">Can't open MediaPoisk.info page</string>
+    <string id="32002">Malformed answer from MediaPoisk.info (see log)</string>
+    <string id="32003">Authorization failed; check login and password</string>
+
+    <string id="32004">Malformed answer from uTorrent</string>
+    <string id="32005">Error accessing uTorrent WebUI, check settings</string>
+    <string id="32006">Can't authenticate in uTorrent, check login/password</string>
+    <string id="32007">uTorrent error: %s</string>
+    <string id="32008">Can't add torrent to uTorrent</string>
+    <string id="32009">Can't set uTorrent download folder</string>
+
+    <string id="32010">Malformed answer from Transmission</string>
+    <string id="32011">Error accessing Transmission, check settings</string>
+    <string id="32012">Can't authenticate in uTorrent, check login/password</string>
+
+    <string id="32013">Can't get torrent data for magnet link</string>
+    <string id="32014">Can't fetch torrent data</string>
+    <string id="32015">Can't decode torrent data (invalid torrent link?)</string>
+    <string id="32016">Torrent URL is unknown</string>
+    <string id="32017">Torrent file name is unknown</string>
+    <string id="32018">Torrent file is not found (%s)</string>
+
+    <string id="32020">Queued</string>
+    <string id="32021">Stopped</string>
+    <string id="32022">Downloading metadata</string>
+    <string id="32023">Check pending</string>
+    <string id="32024">Checking</string>
+    <string id="32025">Download pending</string>
+    <string id="32026">Downloading</string>
+    <string id="32027">Seed pending</string>
+    <string id="32028">Seeding</string>
+    <string id="32029">Allocating</string>
+    <string id="32030">Prebuffering</string>
+    <string id="32031">Starting engine</string>
+
+    <string id="33000">Downloading file</string>
+    <string id="33001">File - %{name}s</string>
+    <string id="33002">Downloaded %(transferred)s / %(total)s</string>
+    <string id="33003">???</string>
+
+    <string id="33010">Opening torrent</string>
+    <string id="33011">%(name)s</string>
+    <string id="33012">%(state)s...</string>
+    <string id="33013">%(state)s... (%(transferred)s / %(total)s)</string>
+    <string id="33014">D:%(download_rate)s U:%(upload_rate)s P:%(peers)d S:%(seeds)d</string>
+    <string id="33015">--</string>
+    <string id="33016">%(transferred)s / %(total)s</string>
+
+    <string id="33020">Plugin is not supported on this platform</string>
+    <string id="33022">Can't make torrent2http executable. Please, ensure it's placed on exec partition and partition is in R/W mode</string>
+    <string id="33023">Can't start torrent2http (check the settings, see log)</string>
+    <string id="33024">Can't send request to torrent2http (see log)</string>
+    <string id="33025">Invalid download path specified (check the settings)</string>
+    <string id="33026">Time out</string>
+    <string id="33027">Torrent error (%s)</string>
+    <string id="33028">torrent2http has crashed (see log for details)</string>
+
+    <string id="33030">Invalid path for temporary files specified (check the settings)</string>
+    <string id="33031">Invalid path for downloaded files specified (check the settings)</string>
+    <string id="33032">Path for downloaded files and temporary path should not be the same</string>
+
+    <string id="33040">Can't connect to AceStream engine</string>
+    <string id="33041">Can't send data to AceStream engine</string>
+    <string id="33042">Can't find AceStream engine executable</string>
+    <string id="33043">Can't start AceStream engine</string>
+    <string id="33044">Time out</string>
+    <string id="33045">Can't load torrent (see log)</string>
+    <string id="33046">Can't play torrent (see log)</string>
+    <string id="33047">Invalid download path specified (check the settings)</string>
+    <string id="33048">Invalid file index</string>
+    <string id="33049">AceStream error (%s)</string>
+    <string id="33050">No playable files detected</string>
+
+    <string id="34003">&lt;&lt; Previous</string>
+    <string id="34004">Next &gt;&gt;</string>
+
+    <string id="40000">Downloading</string>
+    <string id="40001">Use torrent client for downloading</string>
+    <string id="40002">None</string>
+    <string id="40003">UTorrent</string>
+    <string id="40004">Transmission</string>
+    <string id="40005">Login</string>
+    <string id="40006">Password</string>
+    <string id="40007">Host</string>
+    <string id="40008">Port</string>
+    <string id="40009">Path</string>
+
+    <string id="40100">Streaming</string>
+    <string id="40101">Use engine for streaming</string>
+    <string id="40102">Torrent2Http</string>
+    <string id="40103">Ace Stream</string>
+    <string id="40104">Port for incoming connections</string>
+    <string id="40105">Use random port</string>
+    <string id="40106">Limit connections count</string>
+    <string id="40107">Limit download rate, kB/s</string>
+    <string id="40108">Limit upload rate, kB/s</string>
+    <string id="40109">Debug mode</string>
+    <string id="40110">Save files</string>
+    <string id="40111">Pre-buffer amount before start playing, Mb</string>
+    <string id="40112">Temporary files folder</string>
+    <string id="40113">Max temporary folder size, Gb</string>
+    <string id="40114">Never</string>
+    <string id="40115">Always</string>
+    <string id="40116">Ask</string>
+    <string id="40117">Warning! All files in specified folder will be deleted periodically</string>
+    <string id="40118">Show download/upload status on pause</string>
+    <string id="40119">Download on-demand</string>
+
+    <string id="40200">General</string>
+    <string id="40201">Save to folder</string>
+    <string id="40202">Login / E-Mail</string>
+    <string id="40203">Password</string>
+    <string id="40204">Credentials for www.lostfilm.tv</string>
+    <string id="40205">Save downloaded files after watching</string>
+    <string id="40207">Video quality</string>
+    <string id="40208">SD</string>
+    <string id="40209">HD 720p</string>
+    <string id="40210">HD 1080p</string>
+    <string id="40211">Ask</string>
+    <string id="40212">Show original series/episode title</string>
+    <string id="40213">Proxy for loading blocked content</string>
+
+    <string id="40300">Episode information</string>
+    <string id="40301">Play using quality...</string>
+    <string id="40302">Refresh list</string>
+    <string id="40303">Browse using quality...</string>
+    <string id="40305">Toggle watched</string>
+    <string id="40306">TV show information</string>
+
+    <string id="40400">Choose the quality</string>
+    <string id="40401">&lt;&lt; All series &gt;&gt;</string>
+
+</strings>

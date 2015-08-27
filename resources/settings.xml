@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="settings.xsd">
+    <category label="40200">
+        <setting type="lsep" label="40204" />
+        <setting type="text" id="login" label="40202"/>
+        <setting type="text" id="password" label="40203" option="hidden"/>
+        <setting type="sep" />
+        <setting type="number" id="per-page" visible="false" default="15"/>
+        <setting type="enum" id="quality" label="40207" lvalues="40211|40208|40209|40210" default="0"/>
+        <setting type="text" id="anonymous-proxy" label="40213" default="112.93.114.50:80" />
+        <setting type="bool" id="show-original-title" label="40212" default="true"/>
+    </category>
+    <category label="40100">
+        <setting type="folder" id="temp-path" label="40112" option="writeable" default="special://temp/torrent2http"/>
+        <setting type="slider" id="temp-max-size" label="40113" default="5" range="1,1,25" option="int"/>
+        <setting type="bool" id="show-playing-progress" label="40118" default="true"/>
+        <setting type="lsep" label="40117" />
+        <setting type="enum" id="torrent-stream" label="40101" lvalues="40102|40103" default="0"/>
+        <setting type="number" id="t2h-listen-port" label="40104" visible="eq(-1,0)" default="6881" enable="eq(1,false)"/>
+        <setting type="bool" id="t2h-use-random-port" label="40105" visible="eq(-2,0)"/>
+        <setting type="slider" id="t2h-pre-buffer-mb" label="40111" visible="eq(-3,0)" default="15" range="5,5,50" option="int"/>
+        <setting type="number" id="t2h-max-connections" label="40106" visible="false"/>
+        <setting type="number" id="t2h-download-rate" label="40107" visible="false"/>
+        <setting type="number" id="t2h-upload-rate" label="40108" visible="false"/>
+        <setting type="bool" id="t2h-debug-mode" label="40109" visible="eq(-7,0)"/>
+        <setting type="ipaddress" id="as-host" label="40007" visible="eq(-8,1)" default="127.0.0.1"/>
+        <setting type="number" id="as-port" label="40008" visible="eq(-9,1)" default="62062"/>
+    </category>
+    <category label="40000">
+        <setting type="lsep" label="40205" />
+        <setting type="enum" id="save-files" label="40110" lvalues="40114|40115|40116" default="0"/>
+        <setting type="folder" id="save-path" label="40201" option="writeable"/>
+        <setting type="lsep" label="40119" />
+        <setting type="enum" id="torrent-client" label="40001" lvalues="40002|40003|40004" default="0"/>
+        <setting type="ipaddress" id="utorrent-host" label="40007" visible="eq(-1,1)" default="127.0.0.1"/>
+        <setting type="number" id="utorrent-port" label="40008" visible="eq(-2,1)" default="8080"/>
+        <setting type="text" id="utorrent-login" label="40005" visible="eq(-3,1)"/>
+        <setting type="text" id="utorrent-password" option="hidden" label="40006" visible="eq(-4,1)"/>
+        <setting type="ipaddress" id="transmission-host" label="40007" visible="eq(-5,2)" default="127.0.0.1"/>
+        <setting type="number" id="transmission-port" label="40008" visible="eq(-6,2)" default="9091"/>
+        <setting type="text" id="transmission-path" label="40009" visible="eq(-7,2)" default="/transmission"/>
+        <setting type="text" id="transmission-login" label="40005" visible="eq(-8,2)"/>
+        <setting type="text" id="transmission-password" option="hidden" label="40006" visible="eq(-9,2)"/>
+    </category>
+</settings>

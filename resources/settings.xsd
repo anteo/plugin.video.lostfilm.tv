@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by anteo (EMBRACE) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:element name="settings">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="category" type="categoryType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="categoryType">
+		<xs:sequence>
+			<xs:element name="setting" type="settingType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="settingType">
+		<xs:attribute name="range" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="label" type="xs:string"/>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="sep"/>
+					<xs:enumeration value="lsep"/>
+					<xs:enumeration value="text"/>
+					<xs:enumeration value="ipaddress"/>
+					<xs:enumeration value="number"/>
+					<xs:enumeration value="slider"/>
+					<xs:enumeration value="bool"/>
+					<xs:enumeration value="enum"/>
+					<xs:enumeration value="labelenum"/>
+					<xs:enumeration value="file"/>
+					<xs:enumeration value="audio"/>
+					<xs:enumeration value="video"/>
+					<xs:enumeration value="image"/>
+					<xs:enumeration value="executable"/>
+					<xs:enumeration value="folder"/>
+					<xs:enumeration value="action"/>
+					<xs:enumeration value="fileenum"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="default" type="xs:string"/>
+		<xs:attribute name="value" type="xs:string"/>
+		<xs:attribute name="visible" type="xs:string"/>
+		<xs:attribute name="values" type="xs:string"/>
+		<xs:attribute name="lvalues" type="xs:string"/>
+		<xs:attribute name="subsetting" type="xs:boolean"/>
+		<xs:attribute name="enable" type="xs:string"/>
+		<xs:attribute name="action" type="xs:string"/>
+		<xs:attribute name="option">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="hidden"/>
+					<xs:enumeration value="int"/>
+					<xs:enumeration value="urlencoded"/>
+					<xs:enumeration value="float"/>
+					<xs:enumeration value="percent"/>
+					<xs:enumeration value="writeable"/>
+					<xs:enumeration value="hideext"/>
+					<xs:enumeration value="close"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

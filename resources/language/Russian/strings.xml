@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <!-- Plugin name -->
+    <string id="30000">LostFilm.TV</string>
+
+    <string id="32000">Превышено время ожидания при открытии страниц LostFilm.TV</string>
+    <string id="32001">Не могу открыть страницу LostFilm.TV</string>
+    <string id="32002">Некорректный ответ от LostFilm.TV (см. журнал)</string>
+    <string id="32003">Авторизация не прошла; проверьте логин и пароль</string>
+
+    <string id="32004">Некорректный ответ от uTorrent</string>
+    <string id="32005">Ошибка доступа к uTorrent, проверьте настройки</string>
+    <string id="32006">Не могу авторизоваться в uTorrent, проверьте логин/пароль</string>
+    <string id="32007">Ошибка uTorrent: %s</string>
+    <string id="32008">Невозможно добавить торрент в uTorrent</string>
+    <string id="32009">Невозможно установить папку для загрузок в uTorrent</string>
+
+    <string id="32010">Некорректный ответ от Transmission</string>
+    <string id="32011">Ошибка доступа к Transmission, проверьте настройки</string>
+    <string id="32012">Не могу авторизоваться в Transmission, проверьте логин/пароль</string>
+
+    <string id="32013">Невозможно получить данные торрента для magnet-ссылки</string>
+    <string id="32014">Невозможно получить данные торрента</string>
+    <string id="32015">Невозможно декодировать данные торрента (некорректная ссылка?)</string>
+    <string id="32016">URL торрента неизвестен</string>
+    <string id="32017">Имя файла торрента неизвестно</string>
+    <string id="32018">Файл торрента не найден (%s)</string>
+
+    <string id="32020">Ожидание</string>
+    <string id="32021">Остановка</string>
+    <string id="32022">Загрузка метаданных</string>
+    <string id="32023">Ожидание проверки</string>
+    <string id="32024">Проверка</string>
+    <string id="32025">Ожидание загрузки</string>
+    <string id="32026">Загрузка</string>
+    <string id="32027">Ожидание раздачи</string>
+    <string id="32028">Раздача</string>
+    <string id="32029">Выделение места</string>
+    <string id="32030">Пребуферизация</string>
+    <string id="32031">Запуск движка</string>
+
+    <string id="33000">Загрузка файла</string>
+    <string id="33001">Файл - %{name}s</string>
+    <string id="33002">Загружено %(transferred)s / %(total)s</string>
+    <string id="33003">???</string>
+
+    <string id="33010">Открытие торрента</string>
+    <string id="33011">%(name)s</string>
+    <string id="33012">%(state)s...</string>
+    <string id="33013">%(state)s... (%(transferred)s / %(total)s)</string>
+    <string id="33014">D:%(download_rate)s U:%(upload_rate)s P:%(peers)d S:%(seeds)d</string>
+    <string id="33015">--</string>
+    <string id="33016">%(transferred)s / %(total)s</string>
+
+    <string id="33020">Плагин не поддерживается на данной платформе</string>
+    <string id="33022">Невозможно сделать torrent2http исполняемым файлом. Пожалуйста, убедитесь, что он размещен на разделе, с которого разрешен запуск программ, а сам раздел доступен для записи.</string>
+    <string id="33023">Невозможно запустить torrent2http (проверьте настройки, подробности в журнале)</string>
+    <string id="33024">Ошибка запроса torrent2http (подробности в журнале)</string>
+    <string id="33025">Указан некорректный путь для загрузки файлов (проверьте настройки)</string>
+    <string id="33026">Время ожидания истекло</string>
+    <string id="33027">Ошибка торрента (%s)</string>
+    <string id="33028">torrent2http неожиданно завершил работу (подробности в журнале)</string>
+
+    <string id="33030">Указан некорректный путь для временных файлов (проверьте настройки)</string>
+    <string id="33031">Указан некорректный путь для загружаемых файлов (проверьте настройки)</string>
+    <string id="33032">Папка для загружаемых файлов не должна совпадать с папкой для временных файлов</string>
+
+    <string id="33040">Невозможно подключиться с движку AceStream</string>
+    <string id="33041">Невозможно отправить данные движку AceStream</string>
+    <string id="33042">Невозможно найти исполняемый файл движка AceStream</string>
+    <string id="33043">Невозможно запустить движок AceStream</string>
+    <string id="33044">Время ожидания истекло</string>
+    <string id="33045">Невозможно загрузить торрент (смотри журнал)</string>
+    <string id="33046">Невозможно проиграть торрент (смотри журнал)</string>
+    <string id="33047">Указан некорректный путь для загрузки файлов (проверьте настройки)</string>
+    <string id="33048">Указан неверный номер файла</string>
+    <string id="33049">Ошибка AceStream (%s)</string>
+    <string id="33050">Проигрываемые файлы в торренте не обнаружены</string>
+
+    <string id="34003">&lt;&lt; Назад</string>
+    <string id="34004">Далее &gt;&gt;</string>
+
+    <string id="40000">Загрузка</string>
+    <string id="40001">Использовать клиент для загрузки файлов</string>
+    <string id="40002">Нет</string>
+    <string id="40003">UTorrent</string>
+    <string id="40004">Transmission</string>
+    <string id="40005">Логин</string>
+    <string id="40006">Пароль</string>
+    <string id="40007">Хост</string>
+    <string id="40008">Порт</string>
+    <string id="40009">Путь</string>
+
+    <string id="40100">Просмотр</string>
+    <string id="40101">Использовать движок для просмотра</string>
+    <string id="40102">Torrent2Http</string>
+    <string id="40103">Ace Stream</string>
+    <string id="40104">Порт для входящих соединений</string>
+    <string id="40105">Использовать случайный порт</string>
+    <string id="40106">Ограничить количество соединений</string>
+    <string id="40107">Ограничить скорость получения, Кбайт/с</string>
+    <string id="40108">Ограничить скорость отдачи, Кбайт/с</string>
+    <string id="40109">Режим отладки</string>
+    <string id="40110">Сохранять</string>
+    <string id="40111">Загружаемый объем файла до начала просмотра, Мб</string>
+    <string id="40112">Папка для временных файлов</string>
+    <string id="40113">Максимальный размер временной папки, Гб</string>
+    <string id="40114">Никогда</string>
+    <string id="40115">Всегда</string>
+    <string id="40116">Спрашивать</string>
+    <string id="40117">Внимание! Все файлы в указанной папке будут периодически удаляться!</string>
+    <string id="40118">Показывать статус загрузки на паузе</string>
+    <string id="40119">Загрузка по требованию</string>
+
+    <string id="40200">Общее</string>
+    <string id="40201">Сохранять в папку</string>
+    <string id="40202">Логин/E-Mail</string>
+    <string id="40203">Пароль</string>
+    <string id="40204">Данные для входа на www.lostfilm.tv</string>
+    <string id="40205">Сохранять загруженные файлы после просмотра</string>
+    <string id="40207">Качество видео</string>
+    <string id="40208">SD</string>
+    <string id="40209">HD 720p</string>
+    <string id="40210">HD 1080p</string>
+    <string id="40211">Спрашивать</string>
+    <string id="40212">Показывать оригинальное название сериала/серии</string>
+    <string id="40213">Прокси для загрузки заблокированного содержания</string>
+
+    <string id="40300">Информация oб эпизоде</string>
+    <string id="40301">Воспроизвести с качеством...</string>
+    <string id="40302">Обновить список</string>
+    <string id="40303">Открыть с качеством...</string>
+    <string id="40305">Отметить как просм./непросм.</string>
+    <string id="40306">Информация о сериале</string>
+
+    <string id="40400">Выберите качество</string>
+    <string id="40401">&lt;&lt; Все сериалы &gt;&gt;</string>
+
+</strings>
