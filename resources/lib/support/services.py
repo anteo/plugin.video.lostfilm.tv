@@ -119,16 +119,12 @@ def torrent_stream():
     return stream()
 
 
-def common_storage():
-    return plugin.get_storage('common.db', cached=True)
-
-
 def immunizer():
     from support.immunizer import AntiZapretImmunizer
-    storage = common_storage()
+    storage = plugin.get_storage()
     if 'immunizer' not in storage:
         imm = AntiZapretImmunizer()
-        storage.set_item('immunizer', imm, 24 * 60)
+        storage.set('immunizer', imm, 24 * 60)
     else:
         imm = storage['immunizer']
     proxy = plugin.get_setting('anonymous-proxy', str)

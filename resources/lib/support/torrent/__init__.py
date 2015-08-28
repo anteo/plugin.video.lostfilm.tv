@@ -144,7 +144,6 @@ class Torrent:
         if self._url is None:
             if self.has_file_name():
                 self._url = urlparse.urljoin('file:', urllib.pathname2url(ensure_str(self.file_name)))
-                print self._url
             else:
                 raise TorrentError(32016, "Torrent URL is unknown")
         return self._url
