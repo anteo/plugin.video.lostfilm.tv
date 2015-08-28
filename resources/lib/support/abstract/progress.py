@@ -102,13 +102,13 @@ class AbstractTorrentTransferProgress(AbstractFileTransferProgress):
     @staticmethod
     def _human_rate(rate_kbps):
         human, factor = None, None
-        for h, f in (('kB', 0), ('mB', 1024), ('gB', 1024 * 1024)):
+        for h, f in (('kB', 1), ('mB', 1024), ('gB', 1024 * 1024)):
             if rate_kbps >= f:
                 human = h
                 factor = f
             else:
                 break
-        if not factor:
+        if factor is None:
             return '0'
         else:
             return '%.2f%s/s' % (float(rate_kbps) / float(factor), human)
