@@ -34,11 +34,12 @@ def select_quality_menu(e):
     """
     :type e: Episode
     """
-    if plugin.get_setting('quality', int) > 1:
+    if plugin.get_setting('quality', int) > 0:
+        url = episode_url(e, True)
         if e.is_complete_season:
-            return [(lang(40303), actions.update_view(episode_url(e, True)))]
+            return [(lang(40303), actions.update_view(url))]
         else:
-            return [(lang(40301), actions.background(episode_url(e, True)))]
+            return [(lang(40301), actions.play_media(url))]
     else:
         return []
 
@@ -51,16 +52,16 @@ def get_torrent(url):
     return torrent
 
 
-def episode_url(e, select_quality=False):
+def episode_url(e, select_quality=None):
     """
     :type e: Episode
     """
     if e.is_complete_season:
         return plugin.url_for('browse_season', series=e.series_id, season=e.season_number,
-                              select_quality=int(select_quality))
+                              select_quality=select_quality)
     else:
         return plugin.url_for('play_episode', series=e.series_id, season=e.season_number,
-                              episode=e.episode_number, select_quality=int(select_quality))
+                              episode=e.episode_number, select_quality=select_quality)
 
 
 def itemify_episodes(episodes, same_series=False):
@@ -73,7 +74,7 @@ def itemify_episodes(episodes, same_series=False):
     return [itemify_episode(e, series[e.series_id], same_series) for e in episodes]
 
 
-def episode_label(e, same_series = False):
+def episode_label(e, same_series=False):
     """
     :type e: Episode
     """
@@ -210,7 +211,6 @@ def select_torrent_link(series, season, episode, force=False):
             return
         options = ["%s / %s" % (tf.color(l.quality.localized, 'white'), tf.human_size(l.size)) for l in filtered_links]
         res = xbmcgui.Dialog().select(lang(40400), options)
-        print res
         if res < 0:
             return
         return filtered_links[res]
@@ -219,7 +219,7 @@ def select_torrent_link(series, season, episode, force=False):
 
 
 def series_cache():
-    return plugin.get_storage('series.db', 24 * 60 * 7)
+    return plugin.get_storage('series.db', 24 * 60 * 7, cached=False)
 
 
 @singleton
