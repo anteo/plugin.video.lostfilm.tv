@@ -63,30 +63,33 @@ def episode_url(e, select_quality=False):
                               episode=e.episode_number, select_quality=int(select_quality))
 
 
-def itemify_episodes(episodes):
+def itemify_episodes(episodes, same_series=False):
     """
     :type episodes: list[Episode]
     """
     series_ids = list(set(e.series_id for e in episodes))
     scraper = get_scraper()
     series = scraper.get_series_bulk(series_ids)
-    return [itemify_episode(e, series[e.series_id]) for e in episodes]
+    return [itemify_episode(e, series[e.series_id], same_series) for e in episodes]
 
 
-def episode_label(e):
+def episode_label(e, same_series = False):
     """
     :type e: Episode
     """
     label = ""
     if not e.is_complete_season:
         label += tf.color("%02d.%s " % (e.season_number, e.episode_number), 'blue')
-    label += tf.color(e.series_title, 'white') + " / " + e.episode_title
+    if not same_series:
+        label += tf.color(e.series_title, 'white') + " / " + e.episode_title
+    else:
+        label += tf.color(e.episode_title, 'white')
     if e.original_title and plugin.get_setting('show-original-title', bool):
         label += " / " + e.original_title
     return label
 
 
-def itemify_episode(e, s):
+def itemify_episode(e, s, same_series=False):
     """
     :type e: Episode
     :type s: Series
@@ -94,11 +97,11 @@ def itemify_episode(e, s):
     item = itemify_common(s)
     item.update({
         'thumbnail': e.poster,
-        'label': episode_label(e),
+        'label': episode_label(e, same_series),
         'path': episode_url(e),
         'context_menu':
-            select_quality_menu(e) + go_to_series_menu(s) + refresh_menu() +
-            info_menu(e) + toggle_watched_menu(),
+            select_quality_menu(e) + (go_to_series_menu(s) if not same_series else [])
+            + refresh_menu() + info_menu(e) + toggle_watched_menu(),
         'is_playable': not e.is_complete_season,
     })
     item['info'].update({
@@ -164,7 +167,7 @@ def series_label(s):
     """
     label = tf.color(s.title, 'white')
     if plugin.get_setting('show-original-title', bool):
-        label += " (%s)" % s.original_title
+        label += " / " + s.original_title
     return label
 
 
@@ -216,7 +219,7 @@ def select_torrent_link(series, season, episode, force=False):
 
 
 def series_cache():
-    return plugin.get_storage('series.db', 3 * 60)
+    return plugin.get_storage('series.db', 24 * 60 * 7)
 
 
 @singleton

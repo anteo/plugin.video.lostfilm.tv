@@ -40,8 +40,8 @@ def play_episode(series, season, episode):
 def browse_series(series_id):
     plugin.set_content('episodes')
     scraper = get_scraper()
-    series = scraper.get_series_info(series_id)
-    items = itemify_episodes(series.episodes)
+    episodes = scraper.get_series_episodes(series_id)
+    items = itemify_episodes(episodes, same_series=True)
     return with_fanart(items)
 
 

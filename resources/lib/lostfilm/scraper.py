@@ -14,10 +14,9 @@ from util.timer import Timer
 
 
 class Series(namedtuple('Series', ['id', 'title', 'original_title', 'image', 'icon', 'poster', 'country', 'year',
-                                   'genres', 'about', 'actors', 'producers', 'writers', 'plot', 'episodes'])):
-    @property
-    def episodes_count(self):
-        return len([e for e in self.episodes if not e.is_complete_season])
+                                   'genres', 'about', 'actors', 'producers', 'writers', 'plot', 'seasons_count',
+                                   'episodes_count'])):
+    pass
 
 
 class Episode(namedtuple('Episode', ['series_id', 'series_title', 'season_number', 'episode_number', 'episode_title',
@@ -147,36 +146,21 @@ class LostFilmScraper(AbstractScraper):
             return True
         return False
 
-    def get_series_info(self, series_id):
+    def _get_series_doc(self, series_id):
         doc = self.fetch(self.BASE_URL + "/browse.php", {'cat': series_id})
         if 'Контент недоступен' in doc.html and self.immunize_blocked_content(self.response.request.url):
-            return self.get_series_info(series_id)
-        with Timer(logger=self.log, name='Parsing series with ID %d' % series_id):
+            return self._get_series_doc(series_id)
+        return doc
+
+    def get_series_episodes(self, series_id):
+        doc = self._get_series_doc(series_id)
+        episodes = []
+        with Timer(logger=self.log, name='Parsing episodes of series with ID %d' % series_id):
             body = doc.find('div', {'class': 'mid'})
             series_title, original_title = parse_title(body.find('h1').first.text)
             image = self.BASE_URL + body.find('img').attr('src')
             icon = image.replace('/posters/poster_', '/icons/cat_')
-            info = body.find('div').first.text
-
-            res = re.search('Страна: (.+)\r\n', info)
-            country = res.group(1) if res else None
-            res = re.search('Год выхода: (.+)\r\n', info)
-            year = res.group(1) if res else None
-            res = re.search('Жанр: (.+)\r\n', info)
-            genres = res.group(1).split(', ') if res else None
-            res = re.search('О сериале[^\r\n]+\s*(.+?)($|\r\n)', info, re.S | re.M)
-            about = res.group(1) if res else None
-            res = re.search('Актеры:\s*(.+?)($|\r\n)', info, re.S | re.M)
-            actors = [parse_title(t) for t in res.group(1).split(', ')] if res else None
-            res = re.search('Режиссеры:\s*(.+?)($|\r\n)', info, re.S | re.M)
-            producers = res.group(1).split(', ') if res else None
-            res = re.search('Сценаристы:\s*(.+?)($|\r\n)', info, re.S | re.M)
-            writers = res.group(1).split(', ') if res else None
-            res = re.search('Сюжет:\s*(.+?)($|\r\n)', info, re.S | re.M)
-            plot = res.group(1) if res else None
-
             episode_divs = body.find('div', {'class': 't_row.*?'})
-            episodes = []
             series_poster = None
             for ep in episode_divs:
                 title_td = ep.find('td', {'class': 't_episode_title'})
@@ -191,9 +175,44 @@ class LostFilmScraper(AbstractScraper):
                 episode = Episode(series_id, series_title, season_number, episode_number, episode_title,
                                   orig_title, release_date, icon, poster, image)
                 episodes.append(episode)
+            self.log.info("Got %d episode(s) successfully" % (len(episodes)))
+            self.log.debug(repr(episodes).decode("unicode-escape"))
+        return episodes
 
-            series = Series(series_id, series_title, original_title, image, icon, series_poster, country, year,
-                            genres, about, actors, producers, writers, plot, episodes)
+    def get_series_info(self, series_id):
+        doc = self._get_series_doc(series_id)
+        with Timer(logger=self.log, name='Parsing series info with ID %d' % series_id):
+            body = doc.find('div', {'class': 'mid'})
+            series_title, original_title = parse_title(body.find('h1').first.text)
+            image = self.BASE_URL + body.find('img').attr('src')
+            icon = image.replace('/posters/poster_', '/icons/cat_')
+            info = body.find('div').first.text
+
+            res = re.search('Страна: (.+)\r\n', info)
+            country = res.group(1) if res else None
+            res = re.search('Год выхода: (.+)\r\n', info)
+            year = res.group(1) if res else None
+            res = re.search('Жанр: (.+)\r\n', info)
+            genres = res.group(1).split(', ') if res else None
+            res = re.search('Количество сезонов: (.+)\r\n', info)
+            seasons_count = int(res.group(1)) if res else 0
+            res = re.search('О сериале[^\r\n]+\s*(.+?)($|\r\n)', info, re.S | re.M)
+            about = res.group(1) if res else None
+            res = re.search('Актеры:\s*(.+?)($|\r\n)', info, re.S | re.M)
+            actors = [parse_title(t) for t in res.group(1).split(', ')] if res else None
+            res = re.search('Режиссеры:\s*(.+?)($|\r\n)', info, re.S | re.M)
+            producers = res.group(1).split(', ') if res else None
+            res = re.search('Сценаристы:\s*(.+?)($|\r\n)', info, re.S | re.M)
+            writers = res.group(1).split(', ') if res else None
+            res = re.search('Сюжет:\s*(.+?)($|\r\n)', info, re.S | re.M)
+            plot = res.group(1) if res else None
+
+            episodes_count = len(body.find('div', {'class': 't_row.*?'})) - \
+                             len(body.find('label', {'title': 'Сезон полностью'}))
+
+            poster = poster_url(original_title, seasons_count)
+            series = Series(series_id, series_title, original_title, image, icon, poster, country, year,
+                            genres, about, actors, producers, writers, plot, seasons_count, episodes_count)
 
             self.log.info("Parsed '%s' series info successfully" % series_title)
             self.log.debug(repr(series).decode("unicode-escape"))
