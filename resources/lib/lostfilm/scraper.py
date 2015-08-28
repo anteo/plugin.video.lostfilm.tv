@@ -2,11 +2,10 @@
 
 from __future__ import unicode_literals
 from collections import namedtuple
-import multiprocessing
 import hashlib
 import re
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 from support.common import str_to_date, Attribute
 from support.abstract.scraper import AbstractScraper, ScraperError, parse_size
 from util.encoding import ensure_str
@@ -127,7 +126,7 @@ class LostFilmScraper(AbstractScraper):
                         for future in as_completed(futures):
                             result = future.result()
                             self.series_cache[result.id] = results[result.id] = result
-                except multiprocessing.TimeoutError as e:
+                except TimeoutError as e:
                     raise ScraperError(32000, "Timeout while fetching URLs", cause=e)
         return results
 
