@@ -256,7 +256,7 @@ class Storage(DictMixin):
             return datetime(*(time.strptime(s, '%Y-%m-%d %H:%M:%S')[0:6]))
 
     def __setitem__(self, key, value):
-        self.set_item(key, value)
+        self.set(key, value)
 
     def _get_expire_datetime(self, ttl=False):
         if ttl is False:
@@ -302,12 +302,12 @@ class Storage(DictMixin):
         if kwds:
             self.update(kwds)
 
-    def get_item_expire(self, key):
+    def get_expire(self, key):
         if key not in self.expire_cache:
             self.__getitem__(key)
         return self.expire_cache[key]
 
-    def set_item(self, key, value, ttl=None):
+    def set(self, key, value, ttl=None):
         if not self.conn:
             self._connect()
         if self.cached:
@@ -321,7 +321,7 @@ class Storage(DictMixin):
             self._execute(sql, (encode(key), encode(value)))
         self.expire_cache[key] = self._get_expire_datetime()
 
-    def set_item_ttl(self, key, ttl):
+    def set_ttl(self, key, ttl):
         if ttl is None:
             sql = self.SET_ITEM_NO_TTL % self.tablename
         else:
@@ -331,11 +331,11 @@ class Storage(DictMixin):
         else:
             raise KeyError(key)
 
-    def protect_item(self, key):
-        self.set_item_ttl(key, None)
+    def protect(self, key):
+        self.set_ttl(key, None)
 
-    def unprotect_item(self, key):
-        self.set_item_ttl(key, self.ttl)
+    def unprotect(self, key):
+        self.set_ttl(key, self.ttl)
 
     def __iter__(self):
         return iter(self.keys())

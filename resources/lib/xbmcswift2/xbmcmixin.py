@@ -95,7 +95,7 @@ class XBMCMixin(object):
         return [name for name in os.listdir(self.storage_path)
                 if not name.startswith('.')]
 
-    def get_storage(self, name='main', ttl=None, tablename=None, autocommit=True, cached=False):
+    def get_storage(self, name='main.db', ttl=None, tablename=None, autocommit=True, cached=True):
         """Returns a storage for the given name. The returned storage is a
         fully functioning python dictionary and is designed to be used that
         way. It is usually not necessary for the caller to load or save the

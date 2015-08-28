@@ -171,7 +171,7 @@ class UrlRule(object):
 
         # Extra arguments get tacked on to the query string
         qs_items = dict((key, val) for key, val in items.items()
-                        if key not in self._keywords)
+                        if key not in self._keywords and val is not None)
         qs = self._make_qs(qs_items)
 
         if qs:
