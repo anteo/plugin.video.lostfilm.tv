@@ -79,10 +79,10 @@ def episode_label(e):
     """
     label = ""
     if not e.is_complete_season:
-        label += "%02d.%s " % (e.season_number, e.episode_number)
-    label += tf.color(e.episode_title, 'white') + " / " + e.series_title
+        label += tf.color("%02d.%s " % (e.season_number, e.episode_number), 'blue')
+    label += tf.color(e.series_title, 'white') + " / " + e.episode_title
     if e.original_title and plugin.get_setting('show-original-title', bool):
-        label += " (" + e.original_title + ")"
+        label += " / " + e.original_title
     return label
 
 
