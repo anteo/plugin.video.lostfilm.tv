@@ -16,6 +16,10 @@ from plugin import plugin
 
 ADDON_PATH = plugin.addon.getAddonInfo('path')
 RESOURCES_PATH = os.path.join(ADDON_PATH, 'resources')
+
+LOWERCASE_LETTERS = u'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+UPPERCASE_LETTERS = u'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+
 lang = plugin.get_string
 log = logging.getLogger(__name__)
 
@@ -63,7 +67,7 @@ def ensure_path_local(path):
 
 def temp_path():
     path = ensure_path_local(plugin.get_setting('temp-path', unicode))
-    if not direxists(path) and not xbmcvfs.mkdirs(path):
+    if not xbmcvfs.mkdir(path):
         raise LocalizedError(33030, "Invalid temporary path", check_settings=True)
     return path
 
@@ -277,6 +281,32 @@ def with_fanart(item, url=None):
             else:
                 properties["fanart_image"] = url
         return item
+
+
+def translate_string(s, from_letters, to_letters):
+    from_letters = [ord(char) for char in from_letters]
+    trans_table = dict(zip(from_letters, to_letters))
+    return s.translate(trans_table)
+
+
+def uppercase(s):
+    """
+    Convert lowercase letters to uppercase. It's alternative to string.upper() on OpenELEC, where case altering
+    doesn't affect cyrillic letters.
+    :param s:
+    :return: uppercase string
+    """
+    return translate_string(s, LOWERCASE_LETTERS, UPPERCASE_LETTERS)
+
+
+def lowercase(s):
+    """
+    Convert uppercase letters to lowercase. It's alternative to string.lower() on OpenELEC, where case altering
+    doesn't affect cyrillic letters.
+    :param s:
+    :return: lowercase string
+    """
+    return translate_string(s, UPPERCASE_LETTERS, LOWERCASE_LETTERS)
 
 
 class LocalizedEnum(Enum):

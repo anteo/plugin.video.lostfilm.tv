@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import os
 import pickle
 
-from support.common import LocalizedError
+from support.common import LocalizedError, lowercase
 from util.timer import Timer
 from requests import exceptions
 import requests
@@ -70,7 +70,7 @@ def parse_size(size):
     if size.isdigit():
         return long(size)
     else:
-        num, qua = size[:-2].rstrip(), size[-2:].lower()
+        num, qua = size[:-2].rstrip(), lowercase(size[-2:])
         if qua == 'mb' or qua == 'мб':
             return long(float(num) * 1024 * 1024)
         elif qua == 'gb' or qua == 'гб':
