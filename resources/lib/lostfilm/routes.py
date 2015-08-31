@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from support.common import lang, with_fanart, batch, abort_requested
+from support.common import lang, with_fanart, batch, download_torrent
+from xbmcswift2.common import abort_requested
 from support.plugin import plugin
 from lostfilm.common import select_torrent_link, get_scraper, itemify_episodes, get_torrent, itemify_file, play_torrent, \
     itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT
@@ -24,6 +25,15 @@ def browse_season(series, season):
 def play_file(path, file_id):
     torrent = Torrent(file_name=path)
     play_torrent(torrent, file_id)
+
+
+@plugin.route('/download/<series>/<season>/<episode>')
+def download(series, season, episode):
+    link = select_torrent_link(series, season, episode, force=True)
+    if not link:
+        return
+    torrent = get_torrent(link.url)
+    download_torrent(torrent)
 
 
 @plugin.route('/play_episode/<series>/<season>/<episode>')

@@ -129,7 +129,7 @@ def immunizer():
         imm = storage['immunizer']
     proxy = plugin.get_setting('anonymous-proxy', str)
     if proxy:
-        imm.proxy = {'http': proxy}
+        imm.proxy = {'http': "http://" + proxy}
     return imm
 
 

@@ -56,6 +56,9 @@ TorrentFile = namedtuple('TorrentFile', 'index, path, length, md5sum')
 
 
 class TorrentClient:
+    addon_id = None
+    addon_name = None
+
     def __init__(self):
         pass
 

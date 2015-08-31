@@ -12,6 +12,9 @@ class TransmissionError(TorrentClientError):
 
 
 class TransmissionClient(TorrentClient):
+    addon_id = 'script.transmission'
+    addon_name = 'Transmission'
+
     STATUS_MAPPING = {
         0: TorrentStatus.STOPPED,
         1: TorrentStatus.CHECK_PENDING,

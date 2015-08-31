@@ -14,6 +14,9 @@ class UTorrentError(TorrentClientError):
 
 
 class UTorrentClient(TorrentClient):
+    addon_id = 'plugin.program.utorrent'
+    addon_name = 'UTorrent'
+
     STATUS_MAPPING = {
         'error':             TorrentStatus.STOPPED,
         'paused':            TorrentStatus.STOPPED,
@@ -80,7 +83,8 @@ class UTorrentClient(TorrentClient):
 
     def get_settings(self):
         res = self.action(action='getsettings')['settings']
-        return dict((item[0], item[2].decode('windows-1251')) for item in res)
+        self.log.info(res)
+        return dict((item[0], item[2]) for item in res)
 
     def remove(self, torrent_id):
         self.log.info("Removing torrent %s from queue", torrent_id)
@@ -118,6 +122,7 @@ class UTorrentClient(TorrentClient):
         try:
             response = self.requests_session.post(self.url, params=query,
                                                   auth=(self.login, self.password), files=upload_files)
+            response.encoding = 'utf-8'
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             raise UTorrentError(32005, "Can't connect to uTorrent", cause=e, check_settings=True)

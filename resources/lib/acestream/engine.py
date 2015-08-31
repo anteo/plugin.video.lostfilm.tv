@@ -4,6 +4,7 @@ import time
 import os
 import sys
 import logging
+import base64
 import urllib
 
 from . import State, Status
@@ -18,7 +19,7 @@ except ImportError:
 
 class Engine:
     POLL_DELAY = 0.1
-    ADDON_KEY = "n51LvQoTlJzNGaFxseRK-uvnvX-sD4Vm5Axwmc4UcoD-jruxmKsuJaH0eVgE"
+    ADDON_KEY = 'bjUxTHZRb1RsSnpOR2FGeHNlUkstdXZudlgtc0Q0Vm01QXh3bWM0VWNvRC1qcnV4bUtzdUphSDBl\nVmdF\n'
 
     DEFAULT_HOST = "127.0.0.1"
     DEFAULT_PORT = 62062
@@ -344,9 +345,9 @@ class Engine:
             if self.key:
                 import hashlib
                 sha1 = hashlib.sha1()
-
-                sha1.update(self.key + self.ADDON_KEY)
-                cmd = "READY key=%s-%s" % (self.ADDON_KEY.split("-")[0], sha1.hexdigest())
+                addon_key = base64.decodestring(self.ADDON_KEY)
+                sha1.update(self.key + addon_key)
+                cmd = "READY key=%s-%s" % (addon_key.split("-")[0], sha1.hexdigest())
 
             self.sink.send(cmd)
 

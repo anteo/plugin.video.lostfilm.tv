@@ -22,9 +22,11 @@
 
 from UserDict import DictMixin
 
+
 class OrderedDict(dict, DictMixin):
 
     def __init__(self, *args, **kwds):
+        super(OrderedDict, self).__init__(**kwds)
         if len(args) > 1:
             raise TypeError('expected at most 1 arguments, got %d' % len(args))
         try:
@@ -33,6 +35,7 @@ class OrderedDict(dict, DictMixin):
             self.clear()
         self.update(*args, **kwds)
 
+    # noinspection PyAttributeOutsideInit
     def clear(self):
         self.__end = end = []
         end += [None, end, end]         # sentinel node for doubly linked list
@@ -48,9 +51,9 @@ class OrderedDict(dict, DictMixin):
 
     def __delitem__(self, key):
         dict.__delitem__(self, key)
-        key, prev, next = self.__map.pop(key)
-        prev[2] = next
-        next[1] = prev
+        key, prev, nxt = self.__map.pop(key)
+        prev[2] = nxt
+        nxt[1] = prev
 
     def __iter__(self):
         end = self.__end
@@ -83,7 +86,7 @@ class OrderedDict(dict, DictMixin):
         inst_dict = vars(self).copy()
         self.__map, self.__end = tmp
         if inst_dict:
-            return (self.__class__, (items,), inst_dict)
+            return self.__class__, (items,), inst_dict
         return self.__class__, (items,)
 
     def keys(self):
@@ -106,6 +109,7 @@ class OrderedDict(dict, DictMixin):
     def copy(self):
         return self.__class__(self)
 
+    # noinspection PyMethodOverriding
     @classmethod
     def fromkeys(cls, iterable, value=None):
         d = cls()
@@ -117,7 +121,7 @@ class OrderedDict(dict, DictMixin):
         if isinstance(other, OrderedDict):
             if len(self) != len(other):
                 return False
-            for p, q in  zip(self.items(), other.items()):
+            for p, q in zip(self.items(), other.items()):
                 if p != q:
                     return False
             return True

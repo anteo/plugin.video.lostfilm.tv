@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import time
 import os
 import sys
 import shutil
@@ -11,8 +10,9 @@ from contextlib import closing
 from util.causedexception import CausedException
 from util.enum import Enum
 from util.ordereddict import OrderedDict
-from xbmcswift2 import CLI_MODE, xbmc, xbmcvfs, xbmcgui, direxists, ensure_unicode
-from plugin import plugin
+from xbmcswift2 import xbmc, xbmcvfs, xbmcgui, direxists, ensure_unicode, actions
+from support.plugin import plugin
+from xbmcswift2.common import sleep, file_size, get_dir_size
 
 ADDON_PATH = plugin.addon.getAddonInfo('path')
 RESOURCES_PATH = os.path.join(ADDON_PATH, 'resources')
@@ -24,22 +24,8 @@ lang = plugin.get_string
 log = logging.getLogger(__name__)
 
 
-def notify(message, delay=5000):
+def notify(message, delay=10000):
     plugin.notify(message, lang(30000), delay, plugin.addon.getAddonInfo('icon'))
-
-
-def abort_requested():
-    if CLI_MODE:
-        return False
-    else:
-        return xbmc.abortRequested
-
-
-def sleep(ms):
-    if CLI_MODE:
-        time.sleep(ms/1000.0)
-    else:
-        xbmc.sleep(ms)
 
 
 def save_path(local=False):
@@ -51,6 +37,7 @@ def save_path(local=False):
         raise LocalizedError(33031, "Invalid save path", check_settings=True)
     if local:
         path = ensure_path_local(path)
+    path = path.strip("\\/")
     return ensure_unicode(path)
 
 
@@ -105,7 +92,7 @@ class FileCopyingThread(threading.Thread):
             return 100
         else:
             cur_size = xbmcvfs.exists(self.tmp) and file_size(self.tmp) or 0
-            return self.src_size and cur_size*100/self.src_size or 0
+            return self.src_size and cur_size * 100 / self.src_size or 0
 
 
 class FileCopyThread(threading.Thread):
@@ -118,7 +105,7 @@ class FileCopyThread(threading.Thread):
     def run(self):
         progress = xbmcgui.DialogProgressBG()
         with closing(progress):
-            progress.create(lang(40319))
+            progress.create(lang(40163))
             for src, dst in self.files.iteritems():
                 progress.update(0, message=src)
                 copying_thread = FileCopyingThread(src, dst, self.delete)
@@ -157,7 +144,7 @@ def save_files(files, rename=False, on_finish=None):
             on_finish()
         return
     files_to_copy = {}
-    if save != 2 or xbmcgui.Dialog().yesno(lang(30000), *lang(40318).split("|")):
+    if save != 2 or xbmcgui.Dialog().yesno(lang(30000), *lang(40162).split("|")):
         for n, old_path in enumerate(files):
             old_path = ensure_unicode(old_path)
             if old_path not in files_dict:
@@ -179,36 +166,10 @@ def save_files(files, rename=False, on_finish=None):
         on_finish()
 
 
-def file_size(path):
-    return xbmcvfs.Stat(path).st_size()
-
-
-def dirwalk(top, topdown=True):
-    dirs, nondirs = xbmcvfs.listdir(top)
-
-    if topdown:
-        yield top, dirs, nondirs
-    for name in dirs:
-        new_path = os.path.join(top, name)
-        for x in dirwalk(new_path, topdown):
-            yield x
-    if not topdown:
-        yield top, dirs, nondirs
-
-
-def get_dir_size(directory):
-    dir_size = 0
-    for (path, dirs, files) in dirwalk(directory):
-        for f in files:
-            filename = os.path.join(path, f)
-            dir_size += file_size(filename)
-    return dir_size
-
-
 def purge_temp_dir():
     path = temp_path()
     temp_size = get_dir_size(path)
-    max_size = plugin.get_setting('temp-max-size', int)*1024*1024*1024
+    max_size = plugin.get_setting('temp-max-size', int) * 1024 * 1024 * 1024
     log.info("Current temporary folder size / Max size: %d / %d", temp_size, max_size)
     if temp_size > max_size:
         log.info("Purging temporary folder...")
@@ -217,20 +178,6 @@ def purge_temp_dir():
             # noinspection PyBroadException
             if xbmcvfs.mkdirs(path):
                 log.info("New temporary folder size: %d", get_dir_size(path))
-
-
-def get_free_space(folder):
-    """ Return folder/drive free space (in bytes)
-    """
-    import platform
-    import ctypes
-    if platform.system() == 'Windows':
-        free_bytes = ctypes.c_ulonglong(0)
-        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(free_bytes))
-        return free_bytes.value/1024/1024
-    else:
-        st = os.statvfs(folder)
-        return st.f_bavail * st.f_frsize/1024/1024
 
 
 def str_to_date(date_string, date_format='%Y-%m-%d'):
@@ -281,32 +228,6 @@ def with_fanart(item, url=None):
             else:
                 properties["fanart_image"] = url
         return item
-
-
-def translate_string(s, from_letters, to_letters):
-    from_letters = [ord(char) for char in from_letters]
-    trans_table = dict(zip(from_letters, to_letters))
-    return s.translate(trans_table)
-
-
-def uppercase(s):
-    """
-    Convert lowercase letters to uppercase. It's alternative to string.upper() on OpenELEC, where case altering
-    doesn't affect cyrillic letters.
-    :param s:
-    :return: uppercase string
-    """
-    return translate_string(s, LOWERCASE_LETTERS, UPPERCASE_LETTERS)
-
-
-def lowercase(s):
-    """
-    Convert uppercase letters to lowercase. It's alternative to string.lower() on OpenELEC, where case altering
-    doesn't affect cyrillic letters.
-    :param s:
-    :return: lowercase string
-    """
-    return translate_string(s, UPPERCASE_LETTERS, LOWERCASE_LETTERS)
 
 
 class LocalizedEnum(Enum):
@@ -375,3 +296,47 @@ class LocalizedError(CausedException):
             return str(self.reason)
 
 
+def translate_string(s, from_letters, to_letters):
+    from_letters = [ord(char) for char in from_letters]
+    trans_table = dict(zip(from_letters, to_letters))
+    return s.translate(trans_table)
+
+
+def uppercase(s):
+    """
+    Convert lowercase letters to uppercase. It's alternative to string.upper() on OpenELEC, where case altering
+    doesn't affect cyrillic letters.
+    :param s:
+    :return: uppercase string
+    """
+    return translate_string(s, LOWERCASE_LETTERS, UPPERCASE_LETTERS)
+
+
+def lowercase(s):
+    """
+    Convert uppercase letters to lowercase. It's alternative to string.lower() on OpenELEC, where case altering
+    doesn't affect cyrillic letters.
+    :param s:
+    :return: lowercase string
+    """
+    return translate_string(s, UPPERCASE_LETTERS, LOWERCASE_LETTERS)
+
+
+def toggle_watched_menu():
+    return [(lang(40151), actions.toggle_watched())]
+
+
+def refresh_menu():
+    return [(lang(40152), actions.refresh())]
+
+
+def download_torrent(torrent):
+    from support import services
+    client = services.torrent_client()
+    path = plugin.get_setting('custom-save-path', unicode) \
+        if plugin.get_setting('use-custom-save-path', bool) \
+        else save_path(local=True)
+    client.add(torrent, path)
+    if plugin.has_addon(client.addon_id) and \
+            xbmcgui.Dialog().yesno(lang(40160), *(lang(40161) % client.addon_name).split("|")):
+        plugin.run_addon(client.addon_id)

@@ -5,7 +5,7 @@ import support.titleformat as tf
 from xbmcswift2 import xbmcgui, xbmcvfs, actions
 from lostfilm.scraper import Episode, Series, Quality, LostFilmScraper
 from support.torrent import TorrentFile
-from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir
+from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, toggle_watched_menu, refresh_menu
 from support.plugin import plugin
 
 
@@ -18,16 +18,18 @@ def info_menu(obj):
     return [(lang(lang_id), "Action(Info)")]
 
 
-def toggle_watched_menu():
-    return [(lang(40305), actions.toggle_watched())]
-
-
-def refresh_menu():
-    return [(lang(40302), actions.refresh())]
-
-
 def go_to_series_menu(s):
     return [(lang(40307), actions.update_view(series_url(s)))]
+
+
+def download_menu(e):
+    from xbmcswift2 import actions
+    if plugin.get_setting('torrent-client', int):
+        return [(lang(40308), actions.background(plugin.url_for('download', series=e.series_id,
+                                                                season=e.season_number,
+                                                                episode=e.episode_number)))]
+    else:
+        return []
 
 
 def select_quality_menu(e):
@@ -101,8 +103,8 @@ def itemify_episode(e, s, same_series=False):
         'label': episode_label(e, same_series),
         'path': episode_url(e),
         'context_menu':
-            select_quality_menu(e) + (go_to_series_menu(s) if not same_series else [])
-            + refresh_menu() + info_menu(e) + toggle_watched_menu(),
+            select_quality_menu(e) + (go_to_series_menu(s) if not same_series else []) +
+            download_menu(e) + refresh_menu() + info_menu(e) + toggle_watched_menu(),
         'is_playable': not e.is_complete_season,
     })
     item['info'].update({

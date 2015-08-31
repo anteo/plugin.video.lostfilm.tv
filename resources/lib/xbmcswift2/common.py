@@ -7,9 +7,16 @@
     :copyright: (c) 2012 by Jonathan Beluch
     :license: GPLv3, see LICENSE for more details.
 """
+import os
 import sys
+import time
 import urllib
 import urllib2
+
+import xbmc
+from xbmcswift2 import CLI_MODE
+import xbmcvfs
+
 try:
     # noinspection PyPep8Naming
     import cPickle as pickle
@@ -190,3 +197,57 @@ def direxists(path):
 
 def filter_dict(d):
     return dict((data for data in d.iteritems() if data[1] is not None))
+
+
+def abort_requested():
+    if CLI_MODE:
+        return False
+    else:
+        return xbmc.abortRequested
+
+
+def sleep(ms):
+    if CLI_MODE:
+        time.sleep(ms / 1000.0)
+    else:
+        xbmc.sleep(ms)
+
+
+def file_size(path):
+    return xbmcvfs.Stat(path).st_size()
+
+
+def dirwalk(top, topdown=True):
+    dirs, nondirs = xbmcvfs.listdir(top)
+
+    if topdown:
+        yield top, dirs, nondirs
+    for name in dirs:
+        new_path = os.path.join(top, name)
+        for x in dirwalk(new_path, topdown):
+            yield x
+    if not topdown:
+        yield top, dirs, nondirs
+
+
+def get_dir_size(directory):
+    dir_size = 0
+    for (path, dirs, files) in dirwalk(directory):
+        for f in files:
+            filename = os.path.join(path, f)
+            dir_size += file_size(filename)
+    return dir_size
+
+
+def get_free_space(folder):
+    """ Return folder/drive free space (in bytes)
+    """
+    import platform
+    import ctypes
+    if platform.system() == 'Windows':
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(folder), None, None, ctypes.pointer(free_bytes))
+        return free_bytes.value / 1024 / 1024
+    else:
+        st = os.statvfs(folder)
+        return st.f_bavail * st.f_frsize / 1024 / 1024

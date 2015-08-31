@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
-    <!-- Plugin name -->
-    <string id="30000">LostFilm.TV</string>
+    <!-- Common strings below -->
 
-    <string id="32000">Timeout while loading LostFilm.TV pages</string>
-    <string id="32001">Can't open MediaPoisk.info page</string>
-    <string id="32002">Malformed answer from LostFilm.TV (see log)</string>
+    <string id="32000">Timeout while loading %s pages</string>
+    <string id="32001">Can't open %s page</string>
+    <string id="32002">Malformed answer from %s (see log)</string>
     <string id="32003">Authorization failed; check login and password</string>
 
     <string id="32004">Malformed answer from uTorrent</string>
@@ -101,7 +100,7 @@
     <string id="40107">Limit download rate, kB/s</string>
     <string id="40108">Limit upload rate, kB/s</string>
     <string id="40109">Debug mode</string>
-    <string id="40110">Save files</string>
+    <string id="40110">Save files after watching</string>
     <string id="40111">Pre-buffer amount before start playing, Mb</string>
     <string id="40112">Temporary files folder</string>
     <string id="40113">Max temporary folder size, Gb</string>
@@ -111,13 +110,26 @@
     <string id="40117">Warning! All files in specified folder will be deleted periodically</string>
     <string id="40118">Show download/upload status on pause</string>
     <string id="40119">Download on-demand</string>
+    <string id="40120">Custom download folder</string>
+    <string id="40121">Download folder (local for client)</string>
+    <string id="40122">Save to folder</string>
+
+    <string id="40150">Download torrent</string>
+    <string id="40151">Toggle watched</string>
+    <string id="40152">Refresh list</string>
+
+    <string id="40160">Torrent added</string>
+    <string id="40161">Started torrent download.|Would you like to open %s plugin?</string>
+    <string id="40162">Downloading finished.|Do you want to save file?</string>
+    <string id="40163">Copying...</string>
+
+    <!-- Plugin related strings below -->
+
+    <string id="30000">LostFilm.TV</string>
 
     <string id="40200">General</string>
-    <string id="40201">Save to folder</string>
     <string id="40202">Login / E-Mail</string>
     <string id="40203">Password</string>
-    <string id="40204">Credentials for www.lostfilm.tv</string>
-    <string id="40205">Save downloaded files after watching</string>
     <string id="40207">Video quality</string>
     <string id="40208">SD</string>
     <string id="40209">HD 720p</string>
@@ -128,9 +140,7 @@
 
     <string id="40300">Episode information</string>
     <string id="40301">Play using quality...</string>
-    <string id="40302">Refresh list</string>
     <string id="40303">Browse using quality...</string>
-    <string id="40305">Toggle watched</string>
     <string id="40306">TV show information</string>
     <string id="40307">Go to TV show</string>
 

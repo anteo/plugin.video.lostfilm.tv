@@ -311,6 +311,14 @@ class XBMCMixin(object):
         xbmc.executebuiltin('XBMC.Notification("%s", "%s", "%s", "%s")' %
                             (ensure_str(title), ensure_str(msg), delay, ensure_str(image)))
 
+    @staticmethod
+    def run_addon(addon_id):
+        xbmc.executebuiltin('XBMC.RunAddon(%s)' % addon_id)
+
+    @staticmethod
+    def has_addon(addon_id):
+        return bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
+
     def _listitemify(self, item):
         """Creates an xbmcswift2.ListItem if the provided value for item is a
         dict. If item is already a valid xbmcswift2.ListItem, the item is

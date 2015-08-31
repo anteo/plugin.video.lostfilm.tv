@@ -208,7 +208,7 @@ class LostFilmScraper(AbstractScraper):
             plot = res.group(1) if res else None
 
             episodes_count = len(body.find('div', {'class': 't_row.*?'})) - \
-                             len(body.find('label', {'title': 'Сезон полностью'}))
+                len(body.find('label', {'title': 'Сезон полностью'}))
 
             poster = poster_url(original_title, seasons_count)
             series = Series(series_id, series_title, original_title, image, icon, poster, country, year,

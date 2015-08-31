@@ -8,7 +8,7 @@ import os
 # noinspection PyDeprecation
 from contextlib import closing, nested
 from torrent2http import Error, State, Engine, MediaType
-from support.common import abort_requested, sleep
+from xbmcswift2.common import abort_requested, sleep
 from support.torrent import *
 from support.abstract.player import AbstractPlayer
 from support.abstract.progress import AbstractTorrentTransferProgress, DummyTorrentTransferProgress

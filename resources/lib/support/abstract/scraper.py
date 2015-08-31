@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import os
 import pickle
 
-from support.common import LocalizedError, lowercase
+from support.common import LocalizedError, lowercase, lang
 from util.timer import Timer
 from requests import exceptions
 import requests
@@ -37,9 +37,9 @@ class AbstractScraper(object):
                 self.save_cookies()
                 return response
         except exceptions.Timeout as e:
-            raise ScraperError(32000, "Timeout while fetching URL: %s" % url, cause=e)
+            raise ScraperError(32000, "Timeout while fetching URL: %s" % url, lang(30000), cause=e)
         except exceptions.RequestException as e:
-            raise ScraperError(32001, "Can't fetch URL: %s" % url, cause=e)
+            raise ScraperError(32001, "Can't fetch URL: %s" % url, lang(30000), cause=e)
 
 
 def load_cookies(filename):
