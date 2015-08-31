@@ -26,7 +26,7 @@
     </category>
     <category label="40000">
         <setting type="enum" id="save-files" label="40110" lvalues="40114|40115|40116" default="0"/>
-        <setting type="folder" id="save-path" label="40122" option="writeable" visible="!eq(-1,0)"/>
+        <setting type="folder" id="save-path" label="40122" option="writeable"/>
         <setting type="lsep" label="40119" />
         <setting type="enum" id="torrent-client" label="40001" lvalues="40002|40003|40004" default="0"/>
         <setting type="bool" id="use-custom-save-path" label="40120" visible="!eq(-1,0)"/>
