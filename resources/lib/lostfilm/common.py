@@ -2,10 +2,10 @@
 from support import services
 
 import support.titleformat as tf
-from xbmcswift2 import xbmcgui, xbmcvfs, actions
+from xbmcswift2 import xbmcgui, actions
 from lostfilm.scraper import Episode, Series, Quality, LostFilmScraper
 from support.torrent import TorrentFile
-from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, toggle_watched_menu, refresh_menu
+from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, toggle_watched_menu
 from support.plugin import plugin
 
 
@@ -44,14 +44,6 @@ def select_quality_menu(e):
             return [(lang(40301), actions.play_media(url))]
     else:
         return []
-
-
-def get_torrent(url):
-    torrent = services.torrent(url)
-    torrents_path = plugin.addon_data_path("torrents")
-    xbmcvfs.mkdirs(torrents_path)
-    torrent.download_locally(torrents_path)
-    return torrent
 
 
 def episode_url(e, select_quality=None):
@@ -104,7 +96,7 @@ def itemify_episode(e, s, same_series=False):
         'path': episode_url(e),
         'context_menu':
             select_quality_menu(e) + (go_to_series_menu(s) if not same_series else []) +
-            download_menu(e) + refresh_menu() + info_menu(e) + toggle_watched_menu(),
+            download_menu(e) + info_menu(e) + toggle_watched_menu(),
         'is_playable': not e.is_complete_season,
     })
     item['info'].update({

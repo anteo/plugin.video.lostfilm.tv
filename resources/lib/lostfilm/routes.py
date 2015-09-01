@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from support.common import lang, with_fanart, batch, download_torrent
+from support.common import lang, with_fanart, batch, download_torrent, get_torrent
 from xbmcswift2.common import abort_requested
 from support.plugin import plugin
-from lostfilm.common import select_torrent_link, get_scraper, itemify_episodes, get_torrent, itemify_file, play_torrent, \
+from lostfilm.common import select_torrent_link, get_scraper, itemify_episodes, itemify_file, play_torrent, \
     itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT
 from support.torrent import Torrent
 
@@ -106,5 +106,5 @@ def index():
             'path': plugin.request.url_with_params(skip=skip_next)
         })
     plugin.finish(items=with_fanart(items),
-                  cache_to_disc=True,
+                  cache_to_disc=False,
                   update_listing=skip is not None)

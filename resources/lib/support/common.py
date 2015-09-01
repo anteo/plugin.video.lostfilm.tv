@@ -10,9 +10,10 @@ from contextlib import closing
 from util.causedexception import CausedException
 from util.enum import Enum
 from util.ordereddict import OrderedDict
-from xbmcswift2 import xbmc, xbmcvfs, xbmcgui, direxists, ensure_unicode, actions
+from xbmcswift2 import xbmc, xbmcgui, direxists, ensure_unicode, actions
 from support.plugin import plugin
 from xbmcswift2.common import sleep, file_size, get_dir_size
+import xbmcvfs
 
 ADDON_PATH = plugin.addon.getAddonInfo('path')
 RESOURCES_PATH = os.path.join(ADDON_PATH, 'resources')
@@ -340,3 +341,25 @@ def download_torrent(torrent):
     if plugin.has_addon(client.addon_id) and \
             xbmcgui.Dialog().yesno(lang(40160), *(lang(40161) % client.addon_name).split("|")):
         plugin.run_addon(client.addon_id)
+
+
+def run_plugin():
+    try:
+        plugin.run()
+    except LocalizedError as e:
+        e.log()
+        if e.kwargs.get('dialog'):
+            xbmcgui.Dialog().ok(lang(30000), *e.localized.split("|"))
+        else:
+            notify(e.localized)
+        if e.kwargs.get('check_settings'):
+            plugin.open_settings()
+
+
+def get_torrent(url):
+    import support.services as services
+    torrent = services.torrent(url)
+    torrents_path = plugin.addon_data_path("torrents")
+    xbmcvfs.mkdirs(torrents_path)
+    torrent.download_locally(torrents_path)
+    return torrent
