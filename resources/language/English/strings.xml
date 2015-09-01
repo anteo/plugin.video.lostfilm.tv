@@ -44,9 +44,9 @@
     <string id="33003">???</string>
 
     <string id="33010">Opening torrent</string>
-    <string id="33011">%(name)s</string>
+    <string id="33011">[COLOR blue]%(name)s[/COLOR]</string>
     <string id="33012">%(state)s...</string>
-    <string id="33013">%(state)s... (%(transferred)s / %(total)s)</string>
+    <string id="33013">%(state)s... [COLOR gray](%(transferred)s / %(total)s)[/COLOR]</string>
     <string id="33014">D:%(download_rate)s U:%(upload_rate)s P:%(peers)d S:%(seeds)d</string>
     <string id="33015">--</string>
     <string id="33016">%(transferred)s / %(total)s</string>
