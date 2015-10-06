@@ -274,7 +274,7 @@ def parse_onclick(s):
     res = re.findall("ShowAllReleases\('([^']+)','([^']+)','([^']+)'\)", s)
     if res:
         series_id, season, episode = res[0]
-        series_id = int(series_id)
+        series_id = int(series_id.lstrip("_"))
         season = int(season.split('.')[0])
         return series_id, season, episode
     else:
