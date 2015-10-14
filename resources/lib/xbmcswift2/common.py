@@ -221,6 +221,8 @@ def file_size(path):
 def dirwalk(top, topdown=True):
     from xbmcswift2 import xbmcvfs
     dirs, nondirs = xbmcvfs.listdir(top)
+    dirs = [ensure_unicode(d) for d in dirs]
+    nondirs = [ensure_unicode(d) for d in nondirs]
 
     if topdown:
         yield top, dirs, nondirs
