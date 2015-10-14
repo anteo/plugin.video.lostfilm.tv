@@ -321,6 +321,13 @@ class Storage(DictMixin):
             self._execute(sql, (encode(key), encode(value)))
         self.expire_cache[key] = self._get_expire_datetime()
 
+    def setdefault(self, key, default=None, ttl=None):
+        try:
+            return self[key]
+        except KeyError:
+            self.set(key, default, ttl)
+        return default
+
     def set_ttl(self, key, ttl):
         if ttl is None:
             sql = self.SET_ITEM_NO_TTL % self.tablename
@@ -360,8 +367,9 @@ class Storage(DictMixin):
         if self.cached and self.cache:
             self.cached = False
             upd_dict = dict((k, v) for k, v in self.cache.iteritems()
-                            if k not in self.original or self.original[k] != v)
+                            if k not in self.original or not self.original[k] == v)
             if upd_dict:
+                log.debug("Updated storage keys: %s" % ", ".join(upd_dict.keys()))
                 self.update(upd_dict)
             self.original = copy.deepcopy(self.cache)
             self.cached = True

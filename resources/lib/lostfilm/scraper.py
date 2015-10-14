@@ -5,7 +5,7 @@ from collections import namedtuple
 import hashlib
 import re
 
-from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from support.common import str_to_date, Attribute
 from support.abstract.scraper import AbstractScraper, ScraperError, parse_size
 from util.encoding import ensure_str
@@ -56,15 +56,40 @@ TorrentLink = namedtuple('TorrentLink', ['quality', 'url', 'size'])
 class LostFilmScraper(AbstractScraper):
     BASE_URL = "http://www.lostfilm.tv"
     LOGIN_URL = "http://login1.bogi.ru/login.php"
+    BLOCKED_MESSAGE = "Контент недоступен на территории Российской Федерации"
 
-    def __init__(self, login, password, cookie_jar=None, requests_session=None, series_cache=None, max_workers=10):
-        super(LostFilmScraper, self).__init__(cookie_jar, requests_session)
+    def __init__(self, login, password, cookie_jar=None, xrequests_session=None, series_cache=None, max_workers=10,
+                 anonymized_urls=None):
+        super(LostFilmScraper, self).__init__(xrequests_session, cookie_jar)
         self.series_cache = series_cache if series_cache is not None else {}
         self.max_workers = max_workers
         self.response = None
         self.login = login
         self.password = password
         self.has_more = None
+        self.anonymized_urls = anonymized_urls if anonymized_urls is not None else []
+        self.session.add_proxy_need_check(self._check_content_is_blocked)
+        self.session.add_proxy_validator(self._validate_proxy)
+
+    # noinspection PyUnusedLocal
+    def _validate_proxy(self, proxy, request, response):
+        if response.status_code != 200 and response.status_code != 302:
+            return "Returned status %d" % response.status_code
+        if 'browse.php' in request.url or 'serials.php' in request.url:
+            if 'id="MainDiv"' not in response.text:
+                return "Response doesn't match original"
+            elif self.BLOCKED_MESSAGE in response.text:
+                return "Returned blocked content"
+
+    def _check_content_is_blocked(self, request, response):
+        if request.url in self.anonymized_urls:
+            return True
+        elif response and self.BLOCKED_MESSAGE in response.text:
+            self.log.info("Content of %s blocked, trying to use anonymous proxy..." % request.url)
+            self.anonymized_urls.append(request.url)
+            return True
+        else:
+            return False
 
     def fetch(self, url, params=None, data=None, **request_params):
         self.response = super(LostFilmScraper, self).fetch(url, params, data, **request_params)
@@ -75,6 +100,7 @@ class LostFilmScraper(AbstractScraper):
 
     def authorize(self):
         with Timer(logger=self.log, name='Authorization'):
+            self.fetch(self.BASE_URL + '/browse.php')
             doc = self.fetch(self.LOGIN_URL,
                              params={'referer': 'http://www.lostfilm.tv/'},
                              data={'login': self.login, 'password': self.password})
@@ -95,9 +121,12 @@ class LostFilmScraper(AbstractScraper):
         return hashlib.md5(self.login+self.password).hexdigest()
 
     def authorized(self):
-        if self.session.cookies.get('hash') != self.authorization_hash:
+        cookies = self.session.cookies
+        if not cookies.get('uid') or not cookies.get('pass'):
+            return False
+        if cookies.get('hash') != self.authorization_hash:
             try:
-                self.session.cookies.clear('.lostfilm.tv')
+                cookies.clear('.lostfilm.tv')
             except KeyError:
                 pass
             return False
@@ -119,14 +148,11 @@ class LostFilmScraper(AbstractScraper):
         if not_cached_ids:
             with Timer(logger=self.log,
                        name="Bulk fetching series with IDs " + ", ".join(str(i) for i in not_cached_ids)):
-                try:
-                    with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-                        futures = [executor.submit(self.get_series_info, _id) for _id in not_cached_ids]
-                        for future in as_completed(futures):
-                            result = future.result()
-                            self.series_cache[result.id] = results[result.id] = result
-                except TimeoutError as e:
-                    raise ScraperError(32000, "Timeout while fetching URLs", cause=e)
+                with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                    futures = [executor.submit(self.get_series_info, _id) for _id in not_cached_ids]
+                    for future in as_completed(futures):
+                        result = future.result()
+                        self.series_cache[result.id] = results[result.id] = result
         return results
 
     def get_series_cached(self, series_id):
@@ -139,18 +165,8 @@ class LostFilmScraper(AbstractScraper):
         ids = [int(l[16:].lstrip("_")) for l in links]
         return ids
 
-    def immunize_blocked_content(self, url):
-        if url not in self.session.immunizer.urls:
-            self.log.info("Content of %s blocked, trying to immunize..." % url)
-            self.session.immunizer.urls.append(url)
-            return True
-        return False
-
     def _get_series_doc(self, series_id):
-        doc = self.fetch(self.BASE_URL + "/browse.php", {'cat': series_id})
-        if 'Контент недоступен' in doc.html and self.immunize_blocked_content(self.response.request.url):
-            return self._get_series_doc(series_id)
-        return doc
+        return self.fetch(self.BASE_URL + "/browse.php", {'cat': series_id})
 
     def get_series_episodes(self, series_id):
         doc = self._get_series_doc(series_id)
@@ -186,7 +202,7 @@ class LostFilmScraper(AbstractScraper):
             series_title, original_title = parse_title(body.find('h1').first.text)
             image = self.BASE_URL + body.find('img').attr('src')
             icon = image.replace('/posters/poster_', '/icons/cat_')
-            info = body.find('div').first.text
+            info = body.find('div').first.text.replace("\xa0", "")
 
             res = re.search('Страна: (.+)\r\n', info)
             country = res.group(1) if res else None

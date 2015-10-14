@@ -91,7 +91,7 @@ def setup_logging():
     _log.setLevel(GLOBAL_LOG_LEVEL)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s - %(levelname)s - [%(name)s] %(message)s')
+        '%(asctime)s - %(threadName)s - %(levelname)s - [%(name)s] %(message)s')
     handler.setFormatter(formatter)
     handler.addFilter(XBMCFilter())
     _log.addHandler(handler)

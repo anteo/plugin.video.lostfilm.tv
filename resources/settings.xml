@@ -5,7 +5,7 @@
         <setting type="text" id="password" label="40203" option="hidden"/>
         <setting type="number" id="per-page" visible="false" default="15"/>
         <setting type="enum" id="quality" label="40207" lvalues="40211|40208|40209|40210" default="0"/>
-        <setting type="text" id="anonymous-proxy" label="40213" default="112.93.114.50:80" />
+        <setting type="enum" id="use-proxy" label="40164" lvalues="40165|40166|40167" default="1" />
         <setting type="bool" id="show-original-title" label="40212" default="true"/>
     </category>
     <category label="40100">

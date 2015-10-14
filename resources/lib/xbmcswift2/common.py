@@ -13,9 +13,7 @@ import time
 import urllib
 import urllib2
 
-import xbmc
 from xbmcswift2 import CLI_MODE
-import xbmcvfs
 
 try:
     # noinspection PyPep8Naming
@@ -200,6 +198,7 @@ def filter_dict(d):
 
 
 def abort_requested():
+    from xbmcswift2 import xbmc
     if CLI_MODE:
         return False
     else:
@@ -207,6 +206,7 @@ def abort_requested():
 
 
 def sleep(ms):
+    from xbmcswift2 import xbmc
     if CLI_MODE:
         time.sleep(ms / 1000.0)
     else:
@@ -214,10 +214,12 @@ def sleep(ms):
 
 
 def file_size(path):
+    from xbmcswift2 import xbmcvfs
     return xbmcvfs.Stat(path).st_size()
 
 
 def dirwalk(top, topdown=True):
+    from xbmcswift2 import xbmcvfs
     dirs, nondirs = xbmcvfs.listdir(top)
 
     if topdown:

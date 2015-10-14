@@ -20,8 +20,7 @@ def transmission_client():
                               password=plugin.get_setting('transmission-password', unicode),
                               host=plugin.get_setting('transmission-host', unicode),
                               port=plugin.get_setting('transmission-port', int, default=9091),
-                              path=plugin.get_setting('transmission-path', unicode),
-                              requests_session=requests_session())
+                              path=plugin.get_setting('transmission-path', unicode))
 
 
 @singleton
@@ -31,8 +30,7 @@ def utorrent_client():
     return UTorrentClient(login=plugin.get_setting('utorrent-login', unicode),
                           password=plugin.get_setting('utorrent-password', unicode),
                           host=plugin.get_setting('utorrent-host', unicode),
-                          port=plugin.get_setting('utorrent-port', int, default=8080),
-                          requests_session=requests_session())
+                          port=plugin.get_setting('utorrent-port', int, default=8080))
 
 
 @singleton
@@ -119,33 +117,38 @@ def torrent_stream():
     return stream()
 
 
-def immunizer():
-    from support.immunizer import AntiZapretImmunizer
+def proxy_list():
+    from support.hideme import HideMeProxyList, Proxy, SortBy, Anonymity
+
     storage = plugin.get_storage()
-    if 'immunizer' not in storage:
-        imm = AntiZapretImmunizer()
-        storage.set('immunizer', imm, 24 * 60)
-    else:
-        imm = storage['immunizer']
-    proxy = plugin.get_setting('anonymous-proxy', str)
-    if proxy:
-        imm.proxy = {'http': "http://" + proxy}
-    return imm
+    proxies = HideMeProxyList(types=[Proxy.HTTP], except_countries=['RU'], sort_by=SortBy.PING,
+                              anonymity=[Anonymity.LOW, Anonymity.AVG, Anonymity.HIGH])
+    return storage.setdefault('proxies', proxies, ttl=24 * 60 * 3)
 
 
-@singleton
-def requests_session():
+def xrequests_session():
     from requests.packages.urllib3.util import Retry
     from support.xrequests import Session
 
-    return Session(max_retries=Retry(total=3, status_forcelist=[500, 502, 503, 504], backoff_factor=0.3),
-                   timeout=3, immunizer=immunizer())
+    use_proxy = plugin.get_setting('use-proxy', int)
+
+    session = Session(max_retries=Retry(total=2, status_forcelist=[500, 502, 503, 504], backoff_factor=0.3),
+                      timeout=5, proxy_list=proxy_list() if use_proxy else None)
+
+    # noinspection PyUnusedLocal,PyShadowingNames
+    def always_use_proxy(request, response):
+        return True
+
+    if use_proxy == 2:
+        session.add_proxy_need_check(always_use_proxy)
+
+    return session
 
 
 def torrent(url=None, data=None, file_name=None):
     from support.torrent import Torrent
 
-    return Torrent(url, data, file_name, requests_session())
+    return Torrent(url, data, file_name)
 
 
 @singleton

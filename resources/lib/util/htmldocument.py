@@ -89,7 +89,7 @@ class HtmlElement:
             for key, val in attrs.iteritems():
                 res2 = list(re.finditer('(<(%s)[^>]*?(?:%s=[\'"]%s[\'"].*?>))(?ms)' % (tag, key, val), self.html))
                 if not res2 and val.find(" ") == -1:  # Try matching without quotation marks
-                    res2 = list(re.finditer('(<(%s)[^>]*?(?:%s=%s.*?>))(?ms)' % (tag, key, val), self.html))
+                    res2 = list(re.finditer('(<(%s)[^>]*?(?:%s=%s(?:\s+.*?>|>)))(?ms)' % (tag, key, val), self.html))
                 groups = set([item.group() for item in res2])
                 res = [item for item in res if item.group() in groups] if res else res2
         else:

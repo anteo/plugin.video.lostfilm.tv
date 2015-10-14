@@ -3,11 +3,12 @@
 from __future__ import unicode_literals
 import os
 import pickle
-
+from support.abstract.proxylist import ProxyListException
 from support.common import LocalizedError, lowercase, lang
+from support.plugin import plugin
+from support.xrequests import NoValidProxiesFound, Session
 from util.timer import Timer
-from requests import exceptions
-import requests
+from requests import RequestException, Timeout
 import logging
 
 
@@ -16,10 +17,14 @@ class ScraperError(LocalizedError):
 
 
 class AbstractScraper(object):
-    def __init__(self, cookie_jar=None, requests_session=None):
+    def __init__(self, xrequests_session, cookie_jar=None):
+        """
+        :type cookie_jar: str
+        :type xrequests_session: Session
+        """
         self.log = logging.getLogger(__name__)
         self.cookie_jar = cookie_jar
-        self.session = requests_session or requests.Session()
+        self.session = xrequests_session
         if self.cookie_jar and os.path.exists(cookie_jar):
             self.session.cookies = load_cookies(cookie_jar)
 
@@ -36,10 +41,15 @@ class AbstractScraper(object):
                 response.raise_for_status()
                 self.save_cookies()
                 return response
-        except exceptions.Timeout as e:
+        except Timeout as e:
             raise ScraperError(32000, "Timeout while fetching URL: %s" % url, lang(30000), cause=e)
-        except exceptions.RequestException as e:
+        except NoValidProxiesFound as e:
+            raise ScraperError(32005, "Can't find anonymous proxy", cause=e)
+        except RequestException as e:
             raise ScraperError(32001, "Can't fetch URL: %s" % url, lang(30000), cause=e)
+        except ProxyListException as e:
+            plugin.set_setting('use-proxy', 0)
+            raise ScraperError(32004, "Can't load anonymous proxy list", cause=e)
 
 
 def load_cookies(filename):

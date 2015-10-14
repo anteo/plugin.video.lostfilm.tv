@@ -336,8 +336,10 @@ class Plugin(XBMCMixin):
 
     def run(self):
         """The main entry point for a plugin."""
-        self._request = self._parse_request()
-        log.debug('Handling incoming request for %s', self.request.path)
-        items = self._dispatch(self.request.path)
-        self.close_storages()
+        try:
+            self._request = self._parse_request()
+            log.debug('Handling incoming request for %s', self.request.path)
+            items = self._dispatch(self.request.path)
+        finally:
+            self.close_storages()
         return items

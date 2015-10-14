@@ -6,6 +6,8 @@
     <string id="32001">Can't open %s page</string>
     <string id="32002">Malformed answer from %s (see log)</string>
     <string id="32003">Authorization failed; check login and password</string>
+    <string id="32004">Can't load anonymous proxy list, 'use anonymous proxy' option will be unset in the settings</string>
+    <string id="32005">Can't find working anonymous proxy; please try later</string>
 
     <string id="32004">Malformed answer from uTorrent</string>
     <string id="32005">Error accessing uTorrent WebUI, check settings</string>
@@ -123,6 +125,11 @@
     <string id="40162">Downloading finished.|Do you want to save file?</string>
     <string id="40163">Copying...</string>
 
+    <string id="40164">Use anonymous proxy</string>
+    <string id="40165">Never</string>
+    <string id="40166">Only for pages blocked in Russia</string>
+    <string id="40167">Always</string>
+
     <!-- Plugin related strings below -->
 
     <string id="30000">LostFilm.TV</string>
@@ -136,7 +143,6 @@
     <string id="40210">HD 1080p</string>
     <string id="40211">Ask</string>
     <string id="40212">Show original series/episode title</string>
-    <string id="40213">Proxy for loading blocked content</string>
 
     <string id="40300">Episode information</string>
     <string id="40301">Play using quality...</string>

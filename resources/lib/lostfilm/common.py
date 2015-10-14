@@ -218,13 +218,15 @@ def series_cache():
 
 @singleton
 def get_scraper():
-    from support.services import requests_session
+    from support.services import xrequests_session
+    anonymized_urls = plugin.get_storage().setdefault('anonymized_urls', [], ttl=24 * 60 * 7)
     return LostFilmScraper(login=plugin.get_setting('login', unicode),
                            password=plugin.get_setting('password', unicode),
                            cookie_jar=plugin.addon_data_path('cookies'),
-                           requests_session=requests_session(),
+                           xrequests_session=xrequests_session(),
                            max_workers=BATCH_SERIES_COUNT,
-                           series_cache=series_cache())
+                           series_cache=series_cache(),
+                           anonymized_urls=anonymized_urls)
 
 
 def play_torrent(torrent, file_id=None):
