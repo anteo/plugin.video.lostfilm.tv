@@ -55,7 +55,7 @@ class Storage(DictMixin):
     PURGE_ALL = 'DELETE FROM %s WHERE expire < DATETIME("NOW")'
 
     def __init__(self, filename, tablename="unnamed", flag="c", ttl=None, autocommit=True, cached=False,
-                 autopurge=False):
+                 autopurge=False, autorecover=True):
         """
         Initialize a thread-safe sqlite-backed dictionary. The dictionary will
         be a table `tablename` in database file `filename`. A single file (=database)
@@ -81,6 +81,7 @@ class Storage(DictMixin):
         self.tablename = tablename
         self.autocommit = autocommit
         self.cached = cached
+        self.autorecover = autorecover
         self.original = {}
         self.cache = {}
         self.expire_cache = {}
@@ -116,8 +117,20 @@ class Storage(DictMixin):
     def _load(self):
         sql = self.GET_ITEMS % self.tablename
         c = self._execute(sql)
-        self.cache = dict((decode(key), decode(value)) for key, value, expire in c)
-        self.expire_cache = dict((decode(key), self._datetime(expire)) for key, value, expire in c)
+        self.cache = {}
+        self.expire_cache = {}
+        for key, value, expire in c:
+            # noinspection PyBroadException
+            try:
+                k = decode(key)
+                value = decode(value)
+                self.cache[k] = value
+                self.expire_cache[k] = self._datetime(expire)
+            except:
+                if self.autorecover:
+                    self.__delkey(key)
+                else:
+                    raise
         self.original = copy.deepcopy(self.cache)
 
     def _execute(self, sql, params=()):
@@ -160,6 +173,10 @@ class Storage(DictMixin):
             rows = c.fetchone()
             return rows[0] if rows is not None else 0
 
+    def __delkey(self, key):
+        sql = self.DEL_ITEM % self.tablename
+        self._execute(sql, (key,))
+
     def __nonzero__(self):
         if self.cached:
             if not self.conn:
@@ -181,7 +198,17 @@ class Storage(DictMixin):
         else:
             sql = self.GET_KEYS % self.tablename
             c = self._execute(sql)
-            return [decode(key[0]) for key in c]
+            keys = []
+            for key in c:
+                # noinspection PyBroadException
+                try:
+                    keys.append(decode(key[0]))
+                except:
+                    if self.autorecover:
+                        self.__delkey(key[0])
+                    else:
+                        raise
+            return keys
 
     def values(self):
         if self.cached:
@@ -189,9 +216,19 @@ class Storage(DictMixin):
                 self._connect()
             return self.cache.values()
         else:
-            sql = self.GET_VALUES % self.tablename
+            sql = self.GET_ITEMS % self.tablename
             c = self._execute(sql)
-            return [decode(value[0]) for value in c]
+            values = []
+            for key, value, expire in c:
+                # noinspection PyBroadException
+                try:
+                    values.append(decode(value))
+                except:
+                    if self.autorecover:
+                        self.__delkey(key)
+                    else:
+                        raise
+            return values
 
     def items(self):
         if self.cached:
@@ -201,8 +238,19 @@ class Storage(DictMixin):
         else:
             sql = self.GET_ITEMS % self.tablename
             c = self._execute(sql)
-            res = [(decode(key), decode(value)) for key, value, expire in c]
-            self.expire_cache = [(decode(key), self._datetime(expire)) for key, value, expire in c]
+            res = []
+            self.expire_cache = {}
+            for key, value, expire in c:
+                # noinspection PyBroadException
+                try:
+                    k = decode(key)
+                    res.append((k, decode(value)))
+                    self.expire_cache[k] = self._datetime(expire)
+                except:
+                    if self.autorecover:
+                        self.__delkey(key)
+                    else:
+                        raise
             return res
 
     def iterkeys(self):
@@ -242,7 +290,14 @@ class Storage(DictMixin):
             item = c.fetchone()
             if item is None:
                 raise KeyError(key)
-            res = decode(item[0])
+            # noinspection PyBroadException
+            try:
+                res = decode(item[0])
+            except:
+                if self.autorecover:
+                    res = None
+                else:
+                    raise
             if self.cached:
                 self.cache[key] = res
             self.expire_cache[key] = self._datetime(item[1])
@@ -275,8 +330,7 @@ class Storage(DictMixin):
             del self.cache[key]
         elif key not in self:
             raise KeyError(key)
-        sql = self.DEL_ITEM % self.tablename
-        self._execute(sql, (encode(key),))
+        self.__delkey(encode(key))
 
     def update(self, items=None, **kwds):
         if not self.conn:
