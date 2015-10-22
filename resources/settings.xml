@@ -7,6 +7,12 @@
         <setting type="enum" id="quality" label="40207" lvalues="40211|40208|40209|40210" default="0"/>
         <setting type="enum" id="use-proxy" label="40164" lvalues="40165|40166|40167" default="1" />
         <setting type="bool" id="show-original-title" label="40212" default="true"/>
+        <setting type="bool" id="update-xbmc-library" label="40213" default="true"/>
+        <setting type="text" id="library-path" visible="false" default="special://userdata/addon_data/plugin.video.lostfilm.tv/library/"/>
+        <setting type="bool" id="first-start" visible="false"/>
+        <setting type="bool" id="lostfilm-source-created" visible="false"/>
+        <setting type="action" label="40406" action="RunPlugin(plugin://plugin.video.lostfilm.tv/create_source)" option="close" visible="eq(-1,false)"/>
+        <setting type="bool" id="update-library" visible="false"/>
     </category>
     <category label="40100">
         <setting type="folder" id="temp-path" label="40112" option="writeable" default="special://temp/torrent2http"/>

@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-from support import services
+from contextlib import closing
+from support import services, library
 
 import support.titleformat as tf
-from xbmcswift2 import xbmcgui, actions
+from xbmcswift2 import xbmcgui, actions, xbmc, abort_requested
 from lostfilm.scraper import Episode, Series, Quality, LostFilmScraper
 from support.torrent import TorrentFile
-from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, toggle_watched_menu
+from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, LocalizedError, \
+    batch, toggle_watched_menu as toggle_watched_orig_menu
 from support.plugin import plugin
 
 
 BATCH_EPISODES_COUNT = 5
 BATCH_SERIES_COUNT = 20
+LIBRARY_ITEM_COLOR = "FFFFFB8B"
+NEW_LIBRARY_ITEM_COLOR = "lime"
 
 
 def info_menu(obj):
@@ -30,6 +34,21 @@ def download_menu(e):
                                                                 episode=e.episode_number)))]
     else:
         return []
+
+
+def update_library_menu():
+    return [(lang(40311), actions.background(plugin.url_for('update_library_on_demand')))]
+
+
+def library_menu(s):
+    """
+    :type s: Series
+    """
+    items = library_items()
+    if s.id in items:
+        return [(lang(40310), actions.background(plugin.url_for('remove_from_library', series_id=s.id)))]
+    else:
+        return [(lang(40309), actions.background(plugin.url_for('add_to_library', series_id=s.id)))]
 
 
 def select_quality_menu(e):
@@ -75,13 +94,32 @@ def episode_label(e, same_series=False):
     label = ""
     if not e.is_complete_season:
         label += tf.color("%02d.%s " % (e.season_number, e.episode_number), 'blue')
-    if not same_series:
-        label += tf.color(e.series_title, 'white') + " / " + e.episode_title
+    if e in library_new_episodes():
+        label += tf.color("* ", NEW_LIBRARY_ITEM_COLOR)
+    if e.series_id in library_items() and not same_series:
+        color = LIBRARY_ITEM_COLOR
     else:
-        label += tf.color(e.episode_title, 'white')
+        color = 'white'
+    if not same_series:
+        label += tf.color(e.series_title, color) + " / " + e.episode_title
+    else:
+        label += tf.color(e.episode_title, color)
     if e.original_title and plugin.get_setting('show-original-title', bool):
         label += " / " + e.original_title
     return label
+
+
+def toggle_watched_menu(e=None):
+    """
+    :type e: Episode
+    """
+    if e:
+        return [(lang(40151), actions.background(plugin.url_for('toggle_watched',
+                                                                series_id=e.series_id,
+                                                                episode=e.episode_number,
+                                                                season=e.season_number)))]
+    else:
+        return toggle_watched_orig_menu()
 
 
 def itemify_episode(e, s, same_series=False):
@@ -96,7 +134,7 @@ def itemify_episode(e, s, same_series=False):
         'path': episode_url(e),
         'context_menu':
             select_quality_menu(e) + (go_to_series_menu(s) if not same_series else []) +
-            download_menu(e) + info_menu(e) + toggle_watched_menu(),
+            download_menu(e) + info_menu(e) + toggle_watched_menu(e) + library_menu(s),
         'is_playable': not e.is_complete_season,
     })
     item['info'].update({
@@ -156,26 +194,33 @@ def itemify_file(path, series, season, f):
     return item
 
 
-def series_label(s):
+def series_label(s, highlight_library_items=True):
     """
     :type s: Series
     """
-    label = tf.color(s.title, 'white')
+    if s.id in library_items() and highlight_library_items:
+        color = LIBRARY_ITEM_COLOR
+    else:
+        color = 'white'
+    label = tf.color(s.title, color)
     if plugin.get_setting('show-original-title', bool):
         label += " / " + s.original_title
+    new_episodes = library_new_episodes().get_by(series_id=s.id)
+    if new_episodes:
+        label += " (%s)" % tf.color(str(len(new_episodes)), NEW_LIBRARY_ITEM_COLOR)
     return label
 
 
-def itemify_series(s):
+def itemify_series(s, highlight_library_items=True):
     """
     :type s: Series
     """
     item = itemify_common(s)
     item.update({
-        'label': series_label(s),
+        'label': series_label(s, highlight_library_items),
         'path': series_url(s),
         'context_menu':
-            info_menu(s),
+            info_menu(s) + library_menu(s),
         'is_playable': False,
     })
     item['info'].update({
@@ -199,7 +244,7 @@ def select_torrent_link(series, season, episode, force=False):
     qualities = sorted(Quality)
     quality = plugin.get_setting('quality', int)
     ordered_links = [next((l for l in links if l.quality == q), None) for q in qualities]
-    if not quality or force or not ordered_links[quality-1]:
+    if not quality or force or not ordered_links[quality - 1]:
         filtered_links = [l for l in ordered_links if l]
         if not filtered_links:
             return
@@ -209,11 +254,22 @@ def select_torrent_link(series, season, episode, force=False):
             return
         return filtered_links[res]
     else:
-        return ordered_links[quality-1]
+        return ordered_links[quality - 1]
 
 
 def series_cache():
     return plugin.get_storage('series.db', 24 * 60 * 7, cached=False)
+
+
+def library_items():
+    return plugin.get_storage().setdefault('library_items', [])
+
+
+def library_new_episodes():
+    """
+    :rtype : NewEpisodes
+    """
+    return plugin.get_storage().setdefault('new_episodes', NewEpisodes())
 
 
 @singleton
@@ -231,8 +287,108 @@ def get_scraper():
 
 def play_torrent(torrent, file_id=None):
     stream = services.torrent_stream()
-    temp_files = stream.play(services.player(), torrent, file_id=file_id)
+    player = services.player()
+    temp_files = stream.play(player, torrent, file_id=file_id)
     if temp_files:
         save_files(temp_files, rename=not stream.saved_files_needed, on_finish=purge_temp_dir)
     else:
         purge_temp_dir()
+
+
+def create_lostfilm_source():
+    from support.sources import Sources, TvDbScraperSettings, SourceAlreadyExists
+    sources = Sources()
+    plugin.log.info("Creating LostFilm.TV source...")
+    try:
+        sources.add_video(plugin.get_setting('library-path', unicode), 'LostFilm.TV', TvDbScraperSettings())
+    except SourceAlreadyExists:
+        plugin.set_setting('lostfilm-source-created', True)
+        raise LocalizedError(40408, "Source is already exist")
+    plugin.log.info("LostFilm.TV source created, restart needed...")
+    plugin.set_setting('lostfilm-source-created', True)
+    d = xbmcgui.Dialog()
+    if d.yesno(lang(40404), lang(40405)):
+        xbmc.executebuiltin('Quit')
+
+
+def check_first_start():
+    if is_authorized() and not plugin.get_setting('first-start', bool):
+        d = xbmcgui.Dialog()
+        plugin.set_setting('first-start', 'true')
+        if d.yesno(lang(40402), *(lang(40403).split("|"))):
+            create_lostfilm_source()
+
+
+def get_library():
+    path = plugin.get_setting('library-path', unicode)
+    path = xbmc.translatePath(path)
+    return library.Library(path)
+
+
+def is_authorized():
+    return get_scraper().authorized()
+
+
+def update_library():
+    plugin.log.info("Starting LostFilm.TV library update...")
+    progress = xbmcgui.DialogProgressBG()
+    scraper = get_scraper()
+    series_ids = library_items()
+    total = len(series_ids)
+    lib = get_library()
+    processed = 0
+    with closing(progress):
+        progress.create(lang(30000), lang(40409))
+        series_episodes = {}
+        for ids in batch(series_ids, BATCH_SERIES_COUNT):
+            series_episodes.update(scraper.get_series_episodes_bulk(ids))
+            processed += len(ids)
+            progress.update(processed * 100 / total)
+            if abort_requested():
+                return
+        medias = []
+        for series_id, episodes in series_episodes.iteritems():
+            medias.extend(library.Episode(folder=e.series_title, title=e.episode_title,
+                                          season_number=e.season_number, episode_number=e.episode_numbers,
+                                          url=episode_url(e), time_added=e.release_date,
+                                          episode=e)
+                          for e in episodes if not e.is_complete_season)
+        lib.sync(medias)
+        new_episodes = library_new_episodes()
+        new_episodes |= NewEpisodes(lib.added_medias)
+        if plugin.get_setting('update-xbmc-library', bool):
+            if lib.added_medias or lib.created_medias or lib.updated_medias:
+                plugin.wait_library_scan()
+                plugin.log.info("Starting XBMC library update...")
+                plugin.update_library('video', plugin.get_setting('library-path', unicode))
+            if lib.removed_files:
+                plugin.wait_library_scan()
+                plugin.log.info("Starting XBMC library clean...")
+                plugin.clean_library('video', popup=False)
+    plugin.log.info("LostFilm.TV library update finished.")
+    return lib.added_medias or lib.created_medias or lib.updated_medias or lib.removed_files
+
+
+def check_last_episode(e):
+    storage = plugin.get_storage()
+    if 'last_episode' in storage and storage['last_episode'] != e:
+        plugin.log.info("Last episode changed, updating library...")
+        plugin.set_setting('update-library', True)
+    storage['last_episode'] = e
+
+
+class NewEpisodes(set):
+    def remove_by(self, series_id=None, season_number=None, episode_number=None):
+        for e in self.copy():
+            episode = e.payload['episode']
+            if episode.matches(series_id, season_number, episode_number):
+                self.remove(e)
+
+    def get_by(self, series_id=None, season_number=None, episode_number=None):
+        return [e for e in self if e.payload['episode'].matches(series_id, season_number, episode_number)]
+
+    def __contains__(self, item):
+        if isinstance(item, Episode):
+            return any(e.payload['episode'] == item for e in self)
+        else:
+            return super(NewEpisodes, self).__contains__(item)

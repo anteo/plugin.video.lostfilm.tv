@@ -1036,7 +1036,7 @@ def getInfoLabel(infotag):
 
 
 # noinspection PyPep8Naming,PyUnusedLocal
-def getLanguage(format_, region):
+def getLanguage(format_, region=None):
     """
     getLanguage([format], [region])--Returns the active language as a string.
 

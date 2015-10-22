@@ -116,7 +116,6 @@
     <string id="40121">Download folder (local for client)</string>
     <string id="40122">Download folder</string>
 
-    <string id="40150">Download torrent</string>
     <string id="40151">Toggle watched</string>
     <string id="40152">Refresh list</string>
 
@@ -143,14 +142,27 @@
     <string id="40210">HD 1080p</string>
     <string id="40211">Ask</string>
     <string id="40212">Show original series/episode title</string>
+    <string id="40213">Automatically update/clean XBMC library</string>
 
     <string id="40300">Episode information</string>
     <string id="40301">Play using quality...</string>
     <string id="40303">Browse using quality...</string>
     <string id="40306">TV show information</string>
     <string id="40307">Go to TV show</string>
+    <string id="40308">Download torrent</string>
+    <string id="40309">Add TV show to the library</string>
+    <string id="40310">Remove TV show from the library</string>
+    <string id="40311">Update library</string>
 
     <string id="40400">Choose the quality</string>
     <string id="40401">&lt;&lt; All series &gt;&gt;</string>
+    <string id="40402">First start</string>
+    <string id="40403">Plugin can automatically create a source for LostFilm series, so you will have an ability to watch them directly from your library. Do you want to continue? You can also do it later through the settings menu.</string>
+    <string id="40404">Restart needed</string>
+    <string id="40405">For the changes to take effect, you must restart the player. Do you want to exit now?</string>
+    <string id="40406">Create LostFilm series source...</string>
+    <string id="40407">&lt;&lt; My library %s&gt;&gt;</string>
+    <string id="40408">Source is already exist</string>
+    <string id="40409">Updating library...</string>
 
 </strings>

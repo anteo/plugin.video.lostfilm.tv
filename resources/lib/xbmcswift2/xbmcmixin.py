@@ -132,7 +132,7 @@ class XBMCMixin(object):
                 ttl *= 60
 
             storage = Storage(filename, ttl=ttl, tablename=tablename, autocommit=autocommit,
-                              cached=cached, autopurge=True)
+                              cached=cached, autopurge=True, autorecover=True)
             self._unsynced_storages[filename] = storage
             log.debug('Loaded storage "%s" from disk', name)
         return storage
@@ -204,7 +204,8 @@ class XBMCMixin(object):
                             ' or tuple.')
 
     def set_setting(self, key, val):
-        # TODO: STUB THIS OUT ON CLI
+        if isinstance(val, bool):
+            val = str(val).lower()
         return self.addon.setSetting(id=key, value=val)
 
     def open_settings(self):
@@ -270,11 +271,20 @@ class XBMCMixin(object):
         xbmc.executebuiltin('CleanLibrary(%s,%s)' % (library, popup))
 
     @staticmethod
+    def is_scanning_library():
+        return xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic')
+
+    @staticmethod
+    def wait_library_scan():
+        while XBMCMixin.is_scanning_library() and not xbmc.abortRequested:
+            xbmc.sleep(100)
+
+    @staticmethod
     def update_listing(url, replace=False):
         xbmc.executebuiltin('Container.Update(%s%s)' % (url, ",replace" if replace else ""))
 
     @staticmethod
-    def refresh():
+    def refresh_container():
         """Calls XBMC's Container.Refresh"""
         xbmc.executebuiltin('Container.Refresh()')
 

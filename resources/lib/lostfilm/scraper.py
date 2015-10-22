@@ -21,6 +21,22 @@ class Series(namedtuple('Series', ['id', 'title', 'original_title', 'image', 'ic
 
 class Episode(namedtuple('Episode', ['series_id', 'series_title', 'season_number', 'episode_number', 'episode_title',
                                      'original_title', 'release_date', 'icon', 'poster', 'image'])):
+    def __eq__(self, other):
+        return self.series_id == other.series_id and \
+            self.season_number == other.season_number and \
+            self.episode_number == other.episode_number
+
+    def __ne__(self, other):
+        return not self == other
+
+    def matches(self, series_id=None, season_number=None, episode_number=None):
+        def eq(a, b):
+            return str(a).lstrip('0') == str(b).lstrip('0')
+
+        return (series_id is None or eq(self.series_id, series_id)) and \
+               (season_number is None or eq(self.season_number, season_number)) and \
+               (episode_number is None or eq(self.episode_number, episode_number))
+
     @property
     def is_complete_season(self):
         return self.episode_number == "99"
@@ -35,7 +51,7 @@ class Episode(namedtuple('Episode', ['series_id', 'series_title', 'season_number
             start, end = self.episode_number.split("-", 2)
             return range(int(start), int(end)+1)
         else:
-            return self.episode_number
+            return [int(self.episode_number)]
 
 
 class Quality(Attribute):
@@ -194,6 +210,22 @@ class LostFilmScraper(AbstractScraper):
             self.log.info("Got %d episode(s) successfully" % (len(episodes)))
             self.log.debug(repr(episodes).decode("unicode-escape"))
         return episodes
+
+    def get_series_episodes_bulk(self, series_ids):
+        """
+        :rtype : dict[int, list[Episode]]
+        """
+        if not series_ids:
+            return {}
+        results = {}
+        with Timer(logger=self.log,
+                   name="Bulk fetching series episodes with IDs " + ", ".join(str(i) for i in series_ids)):
+            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                futures = dict((executor.submit(self.get_series_episodes, _id), _id) for _id in series_ids)
+                for future in as_completed(futures):
+                    _id = futures[future]
+                    results[_id] = future.result()
+        return results
 
     def get_series_info(self, series_id):
         doc = self._get_series_doc(series_id)

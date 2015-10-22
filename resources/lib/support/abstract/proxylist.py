@@ -33,7 +33,7 @@ class Proxy(object):
 
     @property
     def for_requests(self):
-        return dict((proto, "%s:%s" % (self.ip, self.port)) for proto in self.protocols)
+        return dict((proto, "%s://%s:%s" % (proto, self.ip, self.port)) for proto in self.protocols)
 
     def __eq__(self, other):
         return other and self.__dict__ == other.__dict__

@@ -37,4 +37,5 @@ from xbmcswift2.xbmcmixin import XBMCMixin
 from xbmcswift2.plugin import Plugin
 from xbmcswift2.common import (xbmc_url, enum, clean_dict, pickle_dict,
                                unpickle_args, unpickle_dict, download_page, unhex,
-                               ensure_unicode, ensure_str, ensure_fs_encoding, direxists)
+                               ensure_unicode, ensure_str, ensure_fs_encoding, direxists,
+                               decode_fs, sleep, abort_requested)

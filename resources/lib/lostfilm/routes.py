@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+import support.titleformat as tf
 from support.common import lang, with_fanart, batch, download_torrent, get_torrent
+import xbmc
+from xbmcswift2 import actions
 from xbmcswift2.common import abort_requested
 from support.plugin import plugin
 from lostfilm.common import select_torrent_link, get_scraper, itemify_episodes, itemify_file, play_torrent, \
-    itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT
+    itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT, library_items, update_library_menu, update_library, \
+    library_new_episodes, NEW_LIBRARY_ITEM_COLOR, check_last_episode, check_first_start
 from support.torrent import Torrent
 
 
@@ -43,6 +47,7 @@ def play_episode(series, season, episode):
     if not link:
         return
     torrent = get_torrent(link.url)
+    library_new_episodes().remove_by(series, season, episode)
     play_torrent(torrent)
 
 
@@ -52,7 +57,7 @@ def browse_series(series_id):
     scraper = get_scraper()
     episodes = scraper.get_series_episodes(series_id)
     items = itemify_episodes(episodes, same_series=True)
-    return with_fanart(items)
+    plugin.finish(items=with_fanart(items), cache_to_disc=False)
 
 
 @plugin.route('/browse_all_series')
@@ -70,6 +75,38 @@ def browse_all_series():
     plugin.finish()
 
 
+@plugin.route('/browse_library')
+def browse_library():
+    plugin.set_content('tvshows')
+    scraper = get_scraper()
+    library = library_items()
+    total = len(library)
+    for batch_ids in batch(library, BATCH_SERIES_COUNT):
+        if abort_requested():
+            break
+        series = scraper.get_series_bulk(batch_ids)
+        items = [itemify_series(series[i], highlight_library_items=False) for i in batch_ids]
+        plugin.add_items(with_fanart(items), total)
+    plugin.finish(sort_methods=['unsorted', 'label'])
+
+
+@plugin.route('/add_to_library/<series_id>')
+def add_to_library(series_id):
+    items = library_items()
+    if series_id not in items:
+        items.append(series_id)
+    plugin.set_setting('update-library', True)
+
+
+@plugin.route('/remove_from_library/<series_id>')
+def remove_from_library(series_id):
+    items = library_items()
+    if series_id in items:
+        items.remove(series_id)
+    library_new_episodes().remove_by(series_id=series_id)
+    plugin.set_setting('update-library', True)
+
+
 @plugin.route('/')
 def index():
     plugin.set_content('episodes')
@@ -77,9 +114,16 @@ def index():
     per_page = plugin.get_setting('per-page', int)
     scraper = get_scraper()
     episodes = scraper.browse_episodes(skip)
+    if episodes:
+        check_last_episode(episodes[0])
+    check_first_start()
+    new_episodes = library_new_episodes()
+    new_str = "(%s) " % tf.color(str(len(new_episodes)), NEW_LIBRARY_ITEM_COLOR) if new_episodes else ""
     total = len(episodes)
     header = [
         {'label': lang(40401), 'path': plugin.url_for('browse_all_series')},
+        {'label': lang(40407) % new_str, 'path': plugin.url_for('browse_library'),
+         'context_menu': update_library_menu()},
     ]
     items = []
     if skip:
@@ -108,3 +152,21 @@ def index():
     plugin.finish(items=with_fanart(items),
                   cache_to_disc=False,
                   update_listing=skip is not None)
+
+
+@plugin.route('/create_source')
+def create_source():
+    from lostfilm.common import create_lostfilm_source
+    create_lostfilm_source()
+
+
+@plugin.route('/update_library')
+def update_library_on_demand():
+    plugin.set_setting('update-library', True)
+
+
+@plugin.route('/toggle_watched/<series_id>/<season>/<episode>')
+def toggle_watched(series_id, season, episode):
+    xbmc.executebuiltin(actions.toggle_watched())
+    if series_id in library_items():
+        library_new_episodes().remove_by(series_id, season, episode)
