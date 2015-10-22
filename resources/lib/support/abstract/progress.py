@@ -68,16 +68,16 @@ class LoggingFileTransferProgress(AbstractFileTransferProgress):
         self.log = log or logging.getLogger(__name__)
 
     def open(self):
-        self.log.info("Starting transfer of file"+(" '%s'" % self.name if self.name else "")+"...")
+        self.log.info("Starting transfer of file" + (" '%s'" % self.name if self.name else "") + "...")
 
     def close(self):
-        self.log.info("Finished transfer of file"+(" '%s'" % self.name if self.name else "")+".")
+        self.log.info("Finished transfer of file" + (" '%s'" % self.name if self.name else "") + ".")
 
     def is_cancelled(self):
         return False
 
     def update(self, percent):
-        self.log.info("File"+(" '%s'" % self.name if self.name else "")+" transfer progress: %d%% (%s / %s)",
+        self.log.info("File" + (" '%s'" % self.name if self.name else "") + " transfer progress: %d%% (%s / %s)",
                       percent, self._human_size(self._transferred_bytes), self._human_size(self.size))
 
 

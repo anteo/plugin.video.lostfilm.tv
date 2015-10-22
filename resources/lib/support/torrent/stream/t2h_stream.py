@@ -185,8 +185,8 @@ class Torrent2HttpStream(TorrentStream):
                         self.playing_progress.size = file_status.size
                         player.play(list_item, subtitles.url if subtitles else None)
                         start = time.time()
-                        while not self._aborted() and (player.is_playing()
-                                                       or time.time()-start < self.playback_start_timeout):
+                        while not self._aborted() and (player.is_playing() or
+                                                       time.time() - start < self.playback_start_timeout):
                             sleep(self.SLEEP_DELAY)
                             status = self.engine.status()
                             file_status = self.engine.file_status(file_id)

@@ -18,18 +18,18 @@ class UTorrentClient(TorrentClient):
     addon_name = 'UTorrent'
 
     STATUS_MAPPING = {
-        'error':             TorrentStatus.STOPPED,
-        'paused':            TorrentStatus.STOPPED,
-        'force_paused':      TorrentStatus.STOPPED,
-        'not_loaded':        TorrentStatus.CHECK_PENDING,
-        'checked':           TorrentStatus.CHECKING,
-        'queued':            TorrentStatus.DOWNLOAD_PENDING,
-        'downloading':       TorrentStatus.DOWNLOADING,
+        'error': TorrentStatus.STOPPED,
+        'paused': TorrentStatus.STOPPED,
+        'force_paused': TorrentStatus.STOPPED,
+        'not_loaded': TorrentStatus.CHECK_PENDING,
+        'checked': TorrentStatus.CHECKING,
+        'queued': TorrentStatus.DOWNLOAD_PENDING,
+        'downloading': TorrentStatus.DOWNLOADING,
         'force_downloading': TorrentStatus.DOWNLOADING,
-        'finished':          TorrentStatus.SEED_PENDING,
-        'queued_seed':       TorrentStatus.SEED_PENDING,
-        'seeding':           TorrentStatus.SEEDING,
-        'force_seeding':     TorrentStatus.SEEDING
+        'finished': TorrentStatus.SEED_PENDING,
+        'queued_seed': TorrentStatus.SEED_PENDING,
+        'seeding': TorrentStatus.SEEDING,
+        'force_seeding': TorrentStatus.SEEDING
     }
 
     def __init__(self, login, password, host='127.0.0.1', port=8080, log=None, requests_session=None):
@@ -50,10 +50,10 @@ class UTorrentClient(TorrentClient):
         for r in obj.get('torrents', []):
             res.append(TorrentInfo(
                 torrent_id=r[0],
-                status=self.get_status(r[1], r[4]/10),
+                status=self.get_status(r[1], r[4] / 10),
                 name=r[2],
                 size=r[3],
-                progress=r[4]/10,
+                progress=r[4] / 10,
                 downloaded=r[5],
                 uploaded=r[6],
                 ratio=r[7],

@@ -113,16 +113,16 @@ def positionControl(control, alignment=0, width=1, height=1, offsetX=0, offsetY=
     if alignment & Align.LEFT:
         pass
     elif alignment & Align.RIGHT:
-        x = 1-width-x
+        x = 1 - width - x
     elif alignment & Align.CENTER_X:
-        x += 0.5-width/2.0
+        x += 0.5 - width / 2.0
 
     if alignment & Align.TOP:
         pass
     elif alignment & Align.BOTTOM:
-        y = 1-height-y
+        y = 1 - height - y
     elif alignment & Align.CENTER_Y:
-        y += 0.5-height/2.0
+        y += 0.5 - height / 2.0
 
     screenX = parentX + int(x * parentWidth)
     screenY = parentY + int(y * parentHeight)

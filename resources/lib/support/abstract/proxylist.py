@@ -123,7 +123,7 @@ class ProxyList(object):
             if counter >= len(self.proxies(proto)):
                 self.reload()
                 return self._get_next_proxy(proto)
-            self._proxy_counters[proto] = counter+1
+            self._proxy_counters[proto] = counter + 1
             return self._proxies[proto][counter]
 
     def get_proxy(self, proto=Proxy.HTTP):

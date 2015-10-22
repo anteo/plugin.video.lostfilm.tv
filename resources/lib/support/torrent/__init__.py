@@ -42,7 +42,7 @@ class TorrentStatus(LocalizedEnum):
 
     @property
     def lang_id(self):
-        return 32020+self.value
+        return 32020 + self.value
 
     def __cmp__(self, other):
         return cmp(self.value, other.value)

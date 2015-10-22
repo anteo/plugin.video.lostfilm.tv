@@ -134,10 +134,10 @@ class AceStream(TorrentStream):
                         progress.name = torrent.name
                         progress.size = torrent.files[file_id].length
                         start = time.time()
-                        while player.is_playing() or time.time()-start < self.playback_start_timeout:
+                        while player.is_playing() or time.time() - start < self.playback_start_timeout:
                             status = engine.get_status()
                             state = self._convert_state(status)
-                            update_status = [state, int(round(progress.size*status.progress/100.0)),
+                            update_status = [state, int(round(progress.size * status.progress / 100.0)),
                                              status.down_speed, status.up_speed, 0, status.peers, status.progress]
                             progress.update_status(*update_status)
                             player.get_percent()
@@ -154,7 +154,7 @@ class AceStream(TorrentStream):
         return []
 
     def _poll_engine(self, delay):
-        sleep(int(delay*1000))
+        sleep(int(delay * 1000))
         if self._aborted():
             raise AbortError()
 

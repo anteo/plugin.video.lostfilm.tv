@@ -133,7 +133,7 @@ class HTTPAdapter(adapters.HTTPAdapter):
             self._lock.acquire()
 
         self.log.info("Looking for valid proxy...")
-        executor = ThreadPoolExecutor(max_workers=self.session.proxy_tries/2)
+        executor = ThreadPoolExecutor(max_workers=self.session.proxy_tries / 2)
         futures = [executor.submit(self._try_proxy, request, stream, timeout, verify, cert)
                    for _ in range(self.session.proxy_tries)]
         try:

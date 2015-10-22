@@ -49,7 +49,7 @@ class Episode(namedtuple('Episode', ['series_id', 'series_title', 'season_number
     def episode_numbers(self):
         if self.is_multi_episode:
             start, end = self.episode_number.split("-", 2)
-            return range(int(start), int(end)+1)
+            return range(int(start), int(end) + 1)
         else:
             return [int(self.episode_number)]
 
@@ -134,7 +134,7 @@ class LostFilmScraper(AbstractScraper):
 
     @property
     def authorization_hash(self):
-        return hashlib.md5(self.login+self.password).hexdigest()
+        return hashlib.md5(self.login + self.password).hexdigest()
 
     def authorized(self):
         cookies = self.session.cookies

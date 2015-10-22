@@ -7,7 +7,7 @@ from xbmcswift2 import actions
 from xbmcswift2.common import abort_requested
 from support.plugin import plugin
 from lostfilm.common import select_torrent_link, get_scraper, itemify_episodes, itemify_file, play_torrent, \
-    itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT, library_items, update_library_menu, update_library, \
+    itemify_series, BATCH_SERIES_COUNT, BATCH_EPISODES_COUNT, library_items, update_library_menu, \
     library_new_episodes, NEW_LIBRARY_ITEM_COLOR, check_last_episode, check_first_start
 from support.torrent import Torrent
 

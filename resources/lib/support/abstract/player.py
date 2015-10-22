@@ -56,11 +56,11 @@ class DummyPlayer(AbstractPlayer):
         return self.play_duration
 
     def get_time(self):
-        return time.time()-self.start_time
+        return time.time() - self.start_time
 
     def is_playing(self):
         if self.playing and not self.paused:
-            if time.time()-self.start_time >= self.play_duration:
+            if time.time() - self.start_time >= self.play_duration:
                 self.stop()
         return self.playing
 
