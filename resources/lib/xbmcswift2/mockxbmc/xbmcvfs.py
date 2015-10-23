@@ -4,7 +4,7 @@
 
 import os
 import shutil
-from xbmcswift2.common import ensure_fs_encoding
+from xbmcswift2.common import encode_fs
 from xbmcswift2.logger import log
 
 
@@ -92,7 +92,7 @@ def copy(source, destination):
     Example:
         success = xbmcvfs.copy(source, destination)"""
     try:
-        shutil.copy(ensure_fs_encoding(source), ensure_fs_encoding(destination))
+        shutil.copy(encode_fs(source), encode_fs(destination))
         return True
     except:
         log.warning("Can't copy %s to %s", file, destination, exc_info=True)
@@ -108,7 +108,7 @@ def delete(file):
     Example:
         xbmcvfs.delete(file)"""
     try:
-        os.remove(ensure_fs_encoding(file))
+        os.remove(encode_fs(file))
         return True
     except:
         log.warning("Can't remove %s", file, exc_info=True)
@@ -137,7 +137,7 @@ def mkdir(path):
         success = xbmcfvs.mkdir(path)
     """
     try:
-        os.mkdir(ensure_fs_encoding(path))
+        os.mkdir(encode_fs(path))
         return True
     except:
         log.warning("Can't mkdir %s", path, exc_info=True)
@@ -156,7 +156,7 @@ def mkdirs(path):
     - success = xbmcvfs.mkdirs(path)
     """
     try:
-        os.makedirs(ensure_fs_encoding(path))
+        os.makedirs(encode_fs(path))
         return True
     except:
         log.warning("Can't makedirs %s", path, exc_info=True)
@@ -173,7 +173,7 @@ def rmdir(path):
         success = xbmcfvs.rmdir(path)
     """
     try:
-        os.rmdir(ensure_fs_encoding(path))
+        os.rmdir(encode_fs(path))
         return True
     except:
         log.warning("Can't rmdir %s", path, exc_info=True)
@@ -189,7 +189,7 @@ def exists(path):
     Example:
         success = xbmcvfs.exists(path)"""
     try:
-        return os.path.exists(ensure_fs_encoding(path))
+        return os.path.exists(encode_fs(path))
     except:
         return False
 

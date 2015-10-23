@@ -7,7 +7,7 @@ from xbmcswift2 import xbmcgui, actions, xbmc, abort_requested
 from lostfilm.scraper import Episode, Series, Quality, LostFilmScraper
 from support.torrent import TorrentFile
 from support.common import lang, date_to_str, singleton, save_files, purge_temp_dir, LocalizedError, \
-    batch, toggle_watched_menu as toggle_watched_orig_menu
+    batch, toggle_watched_menu
 from support.plugin import plugin
 
 
@@ -109,17 +109,22 @@ def episode_label(e, same_series=False):
     return label
 
 
-def toggle_watched_menu(e=None):
+def mark_series_watched_menu(series):
     """
-    :type e: Episode
+    :type series: Series
     """
-    if e:
-        return [(lang(40151), actions.background(plugin.url_for('toggle_watched',
-                                                                series_id=e.series_id,
-                                                                episode=e.episode_number,
-                                                                season=e.season_number)))]
-    else:
-        return toggle_watched_orig_menu()
+    return [(lang(40312), actions.background(plugin.url_for('mark_series_watched',
+                                                            series_id=series.id)))]
+
+
+def toggle_episode_watched_menu(episode):
+    """
+    :type episode: Episode
+    """
+    return [(lang(40151), actions.background(plugin.url_for('toggle_episode_watched',
+                                                            series_id=episode.series_id,
+                                                            episode=episode.episode_number,
+                                                            season=episode.season_number)))]
 
 
 def itemify_episode(e, s, same_series=False):
@@ -134,7 +139,7 @@ def itemify_episode(e, s, same_series=False):
         'path': episode_url(e),
         'context_menu':
             select_quality_menu(e) + (go_to_series_menu(s) if not same_series else []) +
-            download_menu(e) + info_menu(e) + toggle_watched_menu(e) + library_menu(s),
+            download_menu(e) + info_menu(e) + toggle_episode_watched_menu(e) + library_menu(s),
         'is_playable': not e.is_complete_season,
     })
     item['info'].update({
@@ -220,7 +225,7 @@ def itemify_series(s, highlight_library_items=True):
         'label': series_label(s, highlight_library_items),
         'path': series_url(s),
         'context_menu':
-            info_menu(s) + library_menu(s),
+            info_menu(s) + library_menu(s) + mark_series_watched_menu(s),
         'is_playable': False,
     })
     item['info'].update({
@@ -356,15 +361,15 @@ def update_library():
         lib.sync(medias)
         new_episodes = library_new_episodes()
         new_episodes |= NewEpisodes(lib.added_medias)
-        if plugin.get_setting('update-xbmc-library', bool):
-            if lib.added_medias or lib.created_medias or lib.updated_medias:
-                plugin.wait_library_scan()
-                plugin.log.info("Starting XBMC library update...")
-                plugin.update_library('video', plugin.get_setting('library-path', unicode))
-            if lib.removed_files:
-                plugin.wait_library_scan()
-                plugin.log.info("Starting XBMC library clean...")
-                plugin.clean_library('video', popup=False)
+    if plugin.get_setting('update-xbmc-library', bool):
+        if lib.added_medias or lib.created_medias or lib.updated_medias:
+            plugin.wait_library_scan()
+            plugin.log.info("Starting XBMC library update...")
+            plugin.update_library('video', plugin.get_setting('library-path', unicode))
+        if lib.removed_files:
+            plugin.wait_library_scan()
+            plugin.log.info("Starting XBMC library clean...")
+            plugin.clean_library('video')
     plugin.log.info("LostFilm.TV library update finished.")
     return lib.added_medias or lib.created_medias or lib.updated_medias or lib.removed_files
 

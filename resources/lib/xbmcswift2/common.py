@@ -188,7 +188,7 @@ def decode_fs(string):
     return unicode(string, get_filesystem_encoding())
 
 
-def ensure_fs_encoding(string):
+def encode_fs(string):
     string = ensure_unicode(string)
     return string.encode(get_filesystem_encoding())
 

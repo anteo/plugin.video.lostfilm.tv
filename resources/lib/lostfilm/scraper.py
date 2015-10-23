@@ -314,7 +314,7 @@ class LostFilmScraper(AbstractScraper):
 
 
 def parse_title(t):
-    title, original_title = re.findall('^(.*?)\s*(?:\((.*)\))?$', t)[0]
+    title, original_title = re.findall('^(.*?)\s*(?:\((.*)\)\.?)?$', t)[0]
     return title, original_title
 
 

@@ -14,7 +14,7 @@ import time
 import os
 
 from datetime import datetime, timedelta
-from xbmcswift2.common import ensure_fs_encoding
+from xbmcswift2.common import encode_fs
 from xbmcswift2.logger import log
 from UserDict import DictMixin
 
@@ -89,7 +89,7 @@ class Storage(DictMixin):
 
     def _connect(self):
         log.debug("Opening Sqlite table %r in %s" % (self.tablename, self.filename))
-        filename = ensure_fs_encoding(self.filename)
+        filename = encode_fs(self.filename)
         if self.flag == 'n':
             if os.path.exists(filename):
                 os.remove(filename)

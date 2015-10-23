@@ -2,7 +2,7 @@
 import sys
 
 
-FILENAME_CLEAN_RE = ur'[/\\<>:"\|\?\* \t\n\r]+'
+FILENAME_CLEAN_RE = ur'[/\\<>:"\|\?\* \t\n\r\u200f]+'
 
 
 def ensure_unicode(string, encoding='utf-8'):
@@ -23,15 +23,15 @@ def get_filesystem_encoding():
     return sys.getfilesystemencoding() or 'utf-8'
 
 
-def decode_fs(string):
-    return unicode(string, get_filesystem_encoding())
+def decode_fs(string, errors='strict'):
+    return unicode(string, get_filesystem_encoding(), errors)
 
 
-def ensure_fs_encoding(string):
+def encode_fs(string, errors='strict'):
     string = ensure_unicode(string)
-    return string.encode(get_filesystem_encoding())
+    return string.encode(get_filesystem_encoding(), errors)
 
 
 def clean_filename(filename):
     import re
-    return re.sub(FILENAME_CLEAN_RE, ' ', filename)
+    return re.sub(FILENAME_CLEAN_RE, ' ', filename).rstrip(".")

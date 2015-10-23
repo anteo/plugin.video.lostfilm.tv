@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from xbmcswift2 import xbmcvfs, xbmc, ensure_fs_encoding
+from xbmcswift2 import xbmcvfs, xbmc, encode_fs
 # noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 import sqlite3
@@ -88,7 +88,7 @@ class MediaDatabase(object):
         return max(versions)
 
     def connect(self):
-        path = ensure_fs_encoding(self.fs_path)
+        path = encode_fs(self.fs_path)
         self.conn = sqlite3.connect(path, detect_types=sqlite3.PARSE_DECLTYPES, isolation_level=None)
 
     def close(self):

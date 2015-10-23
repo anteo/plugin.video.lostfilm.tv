@@ -163,10 +163,19 @@ def create_source():
 @plugin.route('/update_library')
 def update_library_on_demand():
     plugin.set_setting('update-library', True)
+    # from lostfilm.common import update_library
+    # update_library()
 
 
-@plugin.route('/toggle_watched/<series_id>/<season>/<episode>')
-def toggle_watched(series_id, season, episode):
+@plugin.route('/toggle_episode_watched/<series_id>/<season>/<episode>')
+def toggle_episode_watched(series_id, season, episode):
     xbmc.executebuiltin(actions.toggle_watched())
     if series_id in library_items():
         library_new_episodes().remove_by(series_id, season, episode)
+
+
+@plugin.route('/mark_series_watched/<series_id>')
+def mark_series_watched(series_id):
+    xbmc.executebuiltin(actions.toggle_watched())
+    if series_id in library_items():
+        library_new_episodes().remove_by(series_id)

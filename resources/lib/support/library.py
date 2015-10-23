@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from contextlib import closing
-from util.encoding import clean_filename, ensure_fs_encoding, decode_fs
+from util.encoding import clean_filename, encode_fs, decode_fs
 import time
 import logging
 import os
@@ -65,6 +65,10 @@ class StreamFile(object):
     def path(self):
         return os.path.join(self.base_path, self.media.path + '.strm')
 
+    @property
+    def encoded_path(self):
+        return encode_fs(self.path, errors='ignore')
+
     def create(self):
         with closing(open(self.path, 'w')) as fd:
             fd.write(self.media.url)
@@ -77,10 +81,10 @@ class StreamFile(object):
     def touch(self):
         timestamp = self.timestamp
         if timestamp:
-            os.utime(ensure_fs_encoding(self.path), (timestamp, timestamp))
+            os.utime(self.encoded_path, (timestamp, timestamp))
 
     def is_updated(self):
-        return self.timestamp and os.path.getmtime(self.path) != self.timestamp
+        return self.timestamp and os.path.getmtime(self.encoded_path) != self.timestamp
 
 
 class Library(object):
@@ -93,14 +97,18 @@ class Library(object):
         self.removed_files = []
         self.updated_medias = []
 
-        if not os.path.exists(path):
-            os.mkdir(path)
+        if not os.path.exists(self.encoded_path):
+            os.mkdir(self.encoded_path)
+
+    @property
+    def encoded_path(self):
+        return encode_fs(self.path, errors='ignore')
 
     def _remove_unwanted_files(self, all_files, path=None):
         if isinstance(all_files, list):
             all_files = set(all_files)
         if path is None:
-            path = self.path
+            path = self.encoded_path
 
         files = os.listdir(path)
         existing_files = []
@@ -117,7 +125,7 @@ class Library(object):
             os.remove(f)
 
         files = os.listdir(path)
-        if not files and self.path != path:
+        if not files and self.encoded_path != path:
             self.log.info("'%s' has removed" % decode_fs(path))
             os.rmdir(path)
 
@@ -135,14 +143,15 @@ class Library(object):
         for media in medias:
             f = StreamFile(media, self.path)
             path = f.path
+            encoded_path = encode_fs(path, errors='ignore')
             all_files.append(path)
-            if os.path.exists(path):
+            if os.path.exists(encoded_path):
                 if f.is_updated():
                     self.log.info("'%s' has updated" % path)
                     self.updated_medias.append(media)
                     f.touch()
             else:
-                dirname = os.path.dirname(path) + "/"
+                dirname = os.path.dirname(encoded_path) + "/"
                 if dirname in created_dirs:
                     self.created_medias.append(f)
                     self.log.info("'%s' has created" % path)

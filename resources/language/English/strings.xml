@@ -153,6 +153,7 @@
     <string id="40309">Add TV show to the library</string>
     <string id="40310">Remove TV show from the library</string>
     <string id="40311">Update library</string>
+    <string id="40312">Mark all as watched</string>
 
     <string id="40400">Choose the quality</string>
     <string id="40401">&lt;&lt; All series &gt;&gt;</string>
@@ -164,5 +165,6 @@
     <string id="40407">&lt;&lt; My library %s&gt;&gt;</string>
     <string id="40408">Source is already exist</string>
     <string id="40409">Updating library...</string>
+    <string id="40410">Error occurred during updating library (see log)</string>
 
 </strings>
