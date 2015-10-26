@@ -114,7 +114,7 @@ def index():
     per_page = plugin.get_setting('per-page', int)
     scraper = get_scraper()
     episodes = scraper.browse_episodes(skip)
-    if episodes:
+    if episodes and not skip:
         check_last_episode(episodes[0])
     check_first_start()
     new_episodes = library_new_episodes()

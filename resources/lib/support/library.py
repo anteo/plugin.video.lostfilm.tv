@@ -70,7 +70,7 @@ class StreamFile(object):
         return encode_fs(self.path, errors='ignore')
 
     def create(self):
-        with closing(open(self.path, 'w')) as fd:
+        with closing(open(self.encoded_path, 'w')) as fd:
             fd.write(self.media.url)
         self.touch()
 
@@ -122,7 +122,7 @@ class Library(object):
         self.removed_files.extend(to_remove)
         for f in to_remove:
             self.log.info("'%s' has removed" % f)
-            os.remove(f)
+            os.remove(encode_fs(f))
 
         files = os.listdir(path)
         if not files and self.encoded_path != path:
