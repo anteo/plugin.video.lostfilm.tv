@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 
 
 FILENAME_CLEAN_RE = ur'[/\\<>:"\|\?\* \t\n\r\u200f]+'
@@ -20,7 +21,7 @@ def ensure_str(string, encoding='utf-8'):
 
 
 def get_filesystem_encoding():
-    return sys.getfilesystemencoding() or 'utf-8'
+    return sys.getfilesystemencoding() if os.name == 'nt' else 'utf-8'
 
 
 def decode_fs(string, errors='strict'):
