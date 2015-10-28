@@ -12,6 +12,7 @@ import sys
 import time
 import urllib
 import urllib2
+import unicodedata
 
 from xbmcswift2 import CLI_MODE
 
@@ -185,8 +186,9 @@ def get_filesystem_encoding():
 
 
 def decode_fs(string):
-    return unicode(string, get_filesystem_encoding())
-
+    res = unicode(string, get_filesystem_encoding(), errors)
+    res = unicodedata.normalize('NFC', res)
+    return res
 
 def encode_fs(string):
     string = ensure_unicode(string)

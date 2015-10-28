@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import unicodedata
 
 
 FILENAME_CLEAN_RE = ur'[/\\<>:"\|\?\* \t\n\r\u200f]+'
@@ -25,7 +26,9 @@ def get_filesystem_encoding():
 
 
 def decode_fs(string, errors='strict'):
-    return unicode(string, get_filesystem_encoding(), errors)
+    res = unicode(string, get_filesystem_encoding(), errors)
+    res = unicodedata.normalize('NFC', res)
+    return res
 
 
 def encode_fs(string, errors='strict'):
