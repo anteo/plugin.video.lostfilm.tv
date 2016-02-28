@@ -84,6 +84,7 @@ class LostFilmScraper(AbstractScraper):
         self.password = password
         self.has_more = None
         self.anonymized_urls = anonymized_urls if anonymized_urls is not None else []
+        self.session.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36'
         self.session.add_proxy_need_check(self._check_content_is_blocked)
         self.session.add_proxy_validator(self._validate_proxy)
 
